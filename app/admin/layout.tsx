@@ -4,11 +4,14 @@ import { AdminSidebar } from "@/components/admin/sidebar";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
+  // getSession() reads the cookie locally (no network round trip). Safe here
+  // because proxy.ts already did the authoritative getUser() check for this
+  // request — this call only decides whether to render the sidebar chrome.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (!user) return <>{children}</>;
+  if (!session) return <>{children}</>;
 
   return (
     <div className="flex min-h-screen">
