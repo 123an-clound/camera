@@ -3,14 +3,7 @@ import Link from "next/link";
 import { getSiteSettings, settingText } from "@/lib/site-settings";
 import { CartBadge } from "@/components/public/cart-badge";
 import { MobileNav } from "@/components/public/mobile-nav";
-
-const NAV_LINKS = [
-  { href: "/", label: "Trang chủ" },
-  { href: "/products", label: "Sản phẩm" },
-  { href: "/products?mode=rent", label: "Cho thuê" },
-  { href: "/about", label: "Giới thiệu" },
-  { href: "/contact", label: "Liên hệ" },
-] as const;
+import { NavLinks } from "@/components/public/nav-links";
 
 export async function Navbar() {
   const settings = await getSiteSettings();
@@ -24,13 +17,7 @@ export async function Navbar() {
           {logoUrl && <Image src={logoUrl} alt={storeName} width={32} height={32} className="rounded object-contain" />}
           {storeName}
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
-          {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground">
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <NavLinks />
         <div className="flex items-center gap-1">
           <CartBadge />
           <MobileNav />

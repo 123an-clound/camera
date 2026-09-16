@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import type { MouseEvent } from "react";
 import { Badge } from "@/components/ui/badge";
+import { FadeImage } from "@/components/public/fade-image";
 import { formatVND } from "@/lib/format";
 import type { ProductWithImages } from "@/lib/types";
 
@@ -40,12 +40,12 @@ export function ProductCard({ product }: { product: ProductWithImages }) {
       >
         <div className="relative aspect-square bg-muted">
           {primaryImage ? (
-            <Image
+            <FadeImage
               src={primaryImage.url}
               alt={primaryImage.alt ?? product.name}
               fill
               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Chưa có ảnh</div>

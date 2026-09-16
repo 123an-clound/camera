@@ -8,9 +8,9 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 // new route's content swaps in underneath while hidden, then the panel
 // continues sweeping off the bottom to reveal it (mục 6 — "curtain/overlay
 // quét qua" instead of a plain fade).
-const COVER_DURATION = 0.45;
-const REVEAL_DURATION = 0.55;
-const EASE_IN = [0.76, 0, 0.24, 1] as const;
+const COVER_DURATION = 0.22;
+const REVEAL_DURATION = 0.32;
+const EASE_IN = [0.65, 0, 0.35, 1] as const;
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
 export function PageTransition({ children }: { children: ReactNode }) {

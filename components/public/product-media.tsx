@@ -6,6 +6,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Rotate3d, ImageIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FadeImage } from "@/components/public/fade-image";
 import type { ProductImage } from "@/lib/types";
 
 const ProductViewer3D = dynamic(() => import("@/components/public/product-viewer-3d"), {
@@ -88,7 +89,7 @@ export function ProductMedia({
                 i === activeImage ? "border-primary" : "border-transparent"
               }`}
             >
-              <Image src={img.url} alt={img.alt ?? name} fill className="object-cover" />
+              <FadeImage src={img.url} alt={img.alt ?? name} fill className="object-cover" />
             </button>
           ))}
         </div>
