@@ -54,14 +54,14 @@ export function PageTransition({ children }: { children: ReactNode }) {
   return (
     <>
       {shown}
-      {!reducedMotion && (
-        <motion.div
-          aria-hidden
-          initial={{ y: "-100%" }}
-          animate={controls}
-          className="pointer-events-none fixed inset-0 z-[60] border-y-2 border-[oklch(0.8_0.16_70)] bg-[oklch(0.12_0.005_60)]"
-        />
-      )}
+      {/* Always rendered so server and client markup match (reduced motion is only known on
+          the client); with reduced motion it is never animated and stays parked off-screen. */}
+      <motion.div
+        aria-hidden
+        initial={{ y: "-100%" }}
+        animate={controls}
+        className="pointer-events-none fixed inset-0 z-[60] border-y-2 border-[oklch(0.8_0.16_70)] bg-[oklch(0.12_0.005_60)]"
+      />
     </>
   );
 }

@@ -20,7 +20,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
       {active && (
         <motion.span
           layoutId="nav-active-underline"
-          className="absolute inset-x-0 -bottom-2 h-0.5 rounded-full bg-foreground"
+          className="absolute inset-x-0 -bottom-2 h-0.5 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]"
           transition={{ type: "spring", stiffness: 500, damping: 35 }}
         />
       )}

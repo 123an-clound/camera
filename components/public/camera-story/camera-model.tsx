@@ -129,7 +129,7 @@ function Tag({
         ref={ref}
         aria-hidden
         style={{ opacity: 0 }}
-        className="flex -translate-y-1/2 items-center gap-2 whitespace-nowrap font-mono text-[10px] uppercase tracking-widest text-primary"
+        className="hidden -translate-y-1/2 items-center gap-2 whitespace-nowrap md:flex font-mono text-[10px] uppercase tracking-widest text-primary"
       >
         <span className="size-1.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
         <span className="h-px w-8 bg-primary/60" />
@@ -242,14 +242,16 @@ function Shutter({ p, m }: { p: MotionValue<number>; m: Materials }) {
 function Sensor({ p, m }: { p: MotionValue<number>; m: Materials }) {
   const c = 2;
   const { start, end } = CHAPTERS[c];
+  const chip = useRef<THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>>(null);
+  // The sensor glows amber while it is pulled out.
   useFrame(() => {
-    m.sensor.emissiveIntensity = 0.1 + 1.6 * explodeAmount(p.get(), start, end);
+    if (chip.current) chip.current.material.emissiveIntensity = 0.1 + 1.6 * explodeAmount(p.get(), start, end);
   });
   return (
     <group>
       <Part progress={p} chapter={c} from={[LENS_X, 0, 0.12]} to={[LENS_X, -1.3, 0.95]} rotTo={[0.5, 0, 0]}>
         <RoundedBox args={[0.9, 0.7, 0.05]} radius={0.015} smoothness={2} material={m.pcb} />
-        <mesh position={[0, 0, 0.04]} material={m.sensor}>
+        <mesh ref={chip} position={[0, 0, 0.04]} material={m.sensor}>
           <boxGeometry args={[0.62, 0.44, 0.03]} />
         </mesh>
       </Part>

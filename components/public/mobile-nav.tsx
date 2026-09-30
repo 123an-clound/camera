@@ -15,7 +15,7 @@ function MobileNavLink({ href, label, onNavigate }: { href: string; label: strin
       <motion.span
         whileTap={{ scale: 0.97 }}
         className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-          active ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          active ? "bg-muted text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
         }`}
       >
         {label}
@@ -39,7 +39,7 @@ export function MobileNav() {
       </button>
 
       {open && (
-        <nav className="absolute inset-x-0 top-16 z-40 flex flex-col gap-1 border-b border-border/60 bg-background p-4 shadow-sm">
+        <nav className="absolute inset-x-0 top-16 z-40 flex flex-col gap-1 border-b border-border/60 bg-background/95 p-4 shadow-sm backdrop-blur-xl">
           {NAV_LINKS.map((link) => (
             <MobileNavLink key={link.href} href={link.href} label={link.label} onNavigate={() => setOpen(false)} />
           ))}

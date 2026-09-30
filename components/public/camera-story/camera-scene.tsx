@@ -40,8 +40,8 @@ const POSITION_WIDE: Frames = [
 ];
 const POSITION_NARROW: Frames = [
   { at: 0.0, value: [0, 0.7, 0] },
-  { at: 0.24, value: [-0.6, 0.8, 0] },
-  { at: 0.3, value: [-0.6, 0.8, 0] },
+  { at: 0.24, value: [-0.45, 0.8, 0] },
+  { at: 0.3, value: [-0.45, 0.8, 0] },
   { at: 0.42, value: [-0.3, 0.8, 0] },
   { at: 0.6, value: [0, 1.0, 0] },
   { at: 0.86, value: [0, 0.9, 0] },
@@ -78,7 +78,7 @@ function Rig({ progress }: { progress: MotionValue<number> }) {
 
     const pos = sampleKeyframes(p, narrow ? POSITION_NARROW : POSITION_WIDE);
     g.position.set(pos[0], pos[1] + Math.sin(state.clock.elapsedTime * 0.8) * 0.04, pos[2]);
-    g.scale.setScalar(sampleKeyframes(p, SCALE)[0] * (narrow ? 0.55 : 1));
+    g.scale.setScalar(sampleKeyframes(p, SCALE)[0] * (narrow ? 0.5 : 1));
   });
 
   return (
