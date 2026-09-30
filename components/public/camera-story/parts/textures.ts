@@ -1,10 +1,12 @@
 import * as THREE from "three";
 
-// All camera surface detail (leather grain, printed scales, LCD UI, PCB traces, labels)
-// is painted on canvases at runtime: no image downloads, nothing for the CSP to block.
+// All camera surface detail (leather grain, brushed metal, engraved dials, printed lens
+// markings, LCD UI, PCB traces, labels) is painted on canvases at runtime: no image
+// downloads, nothing for the CSP to block. Lettering uses system fonts, not logo artwork.
 
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 const SANS = "ui-sans-serif, system-ui, Segoe UI, Arial, sans-serif";
+const WIDE = "Arial Black, Helvetica Neue, Arial, sans-serif";
 
 // Deterministic PRNG so the generated textures look the same on every load.
 export function rng(seed: number) {
@@ -39,16 +41,39 @@ export function leatherTexture() {
   const r = rng(7);
   g.fillStyle = "#808080";
   g.fillRect(0, 0, 512, 512);
-  for (let i = 0; i < 9000; i++) {
-    const v = 90 + Math.floor(r() * 90);
+  for (let i = 0; i < 11000; i++) {
+    const v = 80 + Math.floor(r() * 100);
     g.fillStyle = `rgb(${v},${v},${v})`;
     g.beginPath();
-    g.ellipse(r() * 512, r() * 512, 1.5 + r() * 3.5, 1.5 + r() * 3, r() * Math.PI, 0, Math.PI * 2);
+    g.ellipse(r() * 512, r() * 512, 1.2 + r() * 3, 1.2 + r() * 2.6, r() * Math.PI, 0, Math.PI * 2);
     g.fill();
   }
   const t = toTexture(c, false);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(3, 3);
+  t.repeat.set(4, 4);
+  return t;
+}
+
+// Fine directional streaks: brushed / bead-blasted aluminium roughness.
+export function brushedTexture() {
+  const { c, g } = canvas(512, 512);
+  const r = rng(5);
+  g.fillStyle = "#6a6a6a";
+  g.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 2400; i++) {
+    const v = 70 + Math.floor(r() * 80);
+    g.strokeStyle = `rgba(${v},${v},${v},0.5)`;
+    g.lineWidth = 0.6 + r();
+    const y = r() * 512;
+    const x = r() * 512;
+    g.beginPath();
+    g.moveTo(x, y);
+    g.lineTo(x + 40 + r() * 160, y + (r() - 0.5) * 2);
+    g.stroke();
+  }
+  const t = toTexture(c, false);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(2, 2);
   return t;
 }
 
@@ -69,94 +94,94 @@ export function knurlTexture(lines = 128) {
   return t;
 }
 
-// Printed band that wraps a lens barrel: text centred on one side of the cylinder.
-export function barrelPrintTexture(items: { text: string; color?: string; size?: number; at: number }[], bg = "#101012") {
-  const { c, g } = canvas(2048, 128);
+// Printed band that wraps a lens barrel.
+export function barrelPrintTexture(items: { text: string; color?: string; size?: number; at: number }[], bg = "#0d0d0f") {
+  const { c, g } = canvas(4096, 128);
   g.fillStyle = bg;
-  g.fillRect(0, 0, 2048, 128);
+  g.fillRect(0, 0, 4096, 128);
   g.textAlign = "center";
   g.textBaseline = "middle";
   for (const it of items) {
     g.fillStyle = it.color ?? "#e8e8e8";
     g.font = `600 ${it.size ?? 54}px ${SANS}`;
-    g.fillText(it.text, it.at * 2048, 66);
+    g.fillText(it.text, it.at * 4096, 66);
   }
   return toTexture(c);
 }
 
-// Focal-length scale with tick marks, for the zoom ring.
-export function zoomScaleTexture() {
-  const { c, g } = canvas(2048, 128);
-  g.fillStyle = "#121214";
-  g.fillRect(0, 0, 2048, 128);
-  const marks = ["24", "28", "35", "50", "70"];
-  g.textAlign = "center";
-  g.textBaseline = "middle";
-  g.font = `600 50px ${SANS}`;
-  marks.forEach((m, i) => {
-    const x = 760 + i * 130;
-    g.fillStyle = "#e8e8e8";
-    g.fillText(m, x, 58);
-    g.fillRect(x - 2, 96, 4, 22);
-  });
-  g.fillStyle = "#f5a524";
-  g.fillRect(620, 40, 70, 8);
-  return toTexture(c);
-}
-
-// Mode / exposure dial caps: labels around the rim of a disc.
-export function dialCapTexture(labels: string[], accentIndex = 0) {
+// Engraved dial top: silver machined disc with numerals round the rim.
+export function dialCapTexture(
+  labels: { text: string; color?: string }[],
+  opts: { title?: string; startDeg?: number; spanDeg?: number } = {}
+) {
   const { c, g } = canvas(512, 512);
-  g.fillStyle = "#16161a";
-  g.fillRect(0, 0, 512, 512);
-  const grad = g.createRadialGradient(256, 256, 20, 256, 256, 256);
-  grad.addColorStop(0, "#2a2a30");
-  grad.addColorStop(1, "#141417");
+  const grad = g.createRadialGradient(256, 256, 10, 256, 256, 256);
+  grad.addColorStop(0, "#d9dbe0");
+  grad.addColorStop(1, "#b9bcc3");
   g.fillStyle = grad;
-  g.beginPath();
-  g.arc(256, 256, 256, 0, Math.PI * 2);
-  g.fill();
-  // concentric machining rings
-  for (let r = 40; r < 250; r += 6) {
-    g.strokeStyle = r % 12 ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.25)";
+  g.fillRect(0, 0, 512, 512);
+  // spun-metal concentric rings
+  const r = rng(9);
+  for (let rad = 20; rad < 256; rad += 2) {
+    const v = 150 + Math.floor(r() * 60);
+    g.strokeStyle = `rgba(${v},${v},${v},0.35)`;
     g.beginPath();
-    g.arc(256, 256, r, 0, Math.PI * 2);
+    g.arc(256, 256, rad, 0, Math.PI * 2);
     g.stroke();
   }
   g.textAlign = "center";
   g.textBaseline = "middle";
-  labels.forEach((label, i) => {
-    const a = -Math.PI / 2 + (i / labels.length) * Math.PI * 2;
+  const start = ((opts.startDeg ?? -90) * Math.PI) / 180;
+  const span = ((opts.spanDeg ?? 360) * Math.PI) / 180;
+  const full = Math.abs(span - Math.PI * 2) < 1e-6;
+  labels.forEach((l, i) => {
+    const a = start + (full ? i / labels.length : i / Math.max(1, labels.length - 1)) * span;
     g.save();
-    g.translate(256 + Math.cos(a) * 190, 256 + Math.sin(a) * 190);
+    g.translate(256 + Math.cos(a) * 196, 256 + Math.sin(a) * 196);
     g.rotate(a + Math.PI / 2);
-    g.fillStyle = i === accentIndex ? "#f5a524" : "#f2f2f2";
-    g.font = `700 ${label.length > 2 ? 34 : 46}px ${SANS}`;
-    g.fillText(label, 0, 0);
+    g.fillStyle = l.color ?? "#141414";
+    g.font = `700 ${l.text.length > 3 ? 30 : l.text.length > 2 ? 36 : 44}px ${SANS}`;
+    g.fillText(l.text, 0, 0);
     g.restore();
   });
-  g.fillStyle = "#0b0b0d";
-  g.beginPath();
-  g.arc(256, 256, 70, 0, Math.PI * 2);
-  g.fill();
+  if (opts.title) {
+    g.fillStyle = "#141414";
+    g.font = `700 34px ${SANS}`;
+    g.fillText(opts.title, 256, 150);
+  }
   return toTexture(c);
 }
 
-// Annulus text on the lens front bezel ("OPTICAL LAB 24-70mm 1:2.8 Ø82").
+// Lettering on a transparent background, for decals laid over painted/metal surfaces.
+export function textTexture(text: string, color: string, opts: { w?: number; h?: number; size?: number; font?: string; weight?: number; spacing?: number } = {}) {
+  const w = opts.w ?? 1024;
+  const h = opts.h ?? 192;
+  const { c, g } = canvas(w, h);
+  g.clearRect(0, 0, w, h);
+  g.fillStyle = color;
+  g.font = `${opts.weight ?? 800} ${opts.size ?? 120}px ${opts.font ?? WIDE}`;
+  g.textAlign = "center";
+  g.textBaseline = "middle";
+  if (opts.spacing) g.letterSpacing = `${opts.spacing}px`;
+  g.fillText(text, w / 2, h / 2 + 4);
+  return toTexture(c);
+}
+
+// Annulus text on the lens front bezel.
 export function bezelTexture(text: string) {
   const { c, g } = canvas(1024, 1024);
-  g.fillStyle = "#0c0c0e";
+  g.fillStyle = "#0b0b0d";
   g.fillRect(0, 0, 1024, 1024);
   g.fillStyle = "#e6e6e6";
-  g.font = `600 40px ${SANS}`;
+  g.font = `600 30px ${SANS}`;
   g.textAlign = "center";
   g.textBaseline = "middle";
   const chars = text.split("");
-  const span = Math.PI * 1.1;
+  const span = Math.PI * 1.65;
   chars.forEach((ch, i) => {
     const a = -Math.PI / 2 - span / 2 + (i / (chars.length - 1)) * span;
     g.save();
-    g.translate(512 + Math.cos(a) * 430, 512 + Math.sin(a) * 430);
+    g.translate(512 + Math.cos(a) * 440, 512 + Math.sin(a) * 440);
     g.rotate(a + Math.PI / 2);
     g.fillText(ch, 0, 0);
     g.restore();
@@ -164,95 +189,82 @@ export function bezelTexture(text: string) {
   return toTexture(c);
 }
 
-// Rear LCD: a live-view frame with exposure readout, histogram and AF box.
+// Rear LCD: live view with a Fujifilm-style shooting display.
 export function lcdTexture() {
-  const { c, g } = canvas(1024, 680);
-  // "scene": dusk sky, sun, hills
-  const sky = g.createLinearGradient(0, 0, 0, 680);
+  const { c, g } = canvas(1024, 768);
+  const sky = g.createLinearGradient(0, 0, 0, 768);
   sky.addColorStop(0, "#1b2a4a");
   sky.addColorStop(0.55, "#d9773a");
   sky.addColorStop(1, "#2a1a1a");
   g.fillStyle = sky;
-  g.fillRect(0, 0, 1024, 680);
+  g.fillRect(0, 0, 1024, 768);
   g.fillStyle = "#ffd28a";
   g.beginPath();
-  g.arc(640, 380, 60, 0, Math.PI * 2);
+  g.arc(640, 430, 64, 0, Math.PI * 2);
   g.fill();
   g.fillStyle = "#1a1418";
   g.beginPath();
-  g.moveTo(0, 470);
-  g.bezierCurveTo(200, 390, 380, 520, 560, 450);
-  g.bezierCurveTo(740, 380, 880, 470, 1024, 420);
-  g.lineTo(1024, 680);
-  g.lineTo(0, 680);
+  g.moveTo(0, 530);
+  g.bezierCurveTo(200, 440, 380, 580, 560, 510);
+  g.bezierCurveTo(740, 430, 880, 530, 1024, 470);
+  g.lineTo(1024, 768);
+  g.lineTo(0, 768);
   g.fill();
-  // rule-of-thirds grid
   g.strokeStyle = "rgba(255,255,255,0.18)";
   g.lineWidth = 2;
   for (const x of [341, 683]) {
     g.beginPath();
     g.moveTo(x, 0);
-    g.lineTo(x, 680);
+    g.lineTo(x, 768);
     g.stroke();
   }
-  for (const y of [227, 453]) {
+  for (const y of [256, 512]) {
     g.beginPath();
     g.moveTo(0, y);
     g.lineTo(1024, y);
     g.stroke();
   }
-  // AF box
   g.strokeStyle = "#7CFC7C";
   g.lineWidth = 5;
-  const bx = 580, by = 320, bw = 120, bh = 120, k = 28;
-  for (const [x, y, dx, dy] of [
-    [bx, by, 1, 1],
-    [bx + bw, by, -1, 1],
-    [bx, by + bh, 1, -1],
-    [bx + bw, by + bh, -1, -1],
-  ]) {
-    g.beginPath();
-    g.moveTo(x + dx * k, y);
-    g.lineTo(x, y);
-    g.lineTo(x, y + dy * k);
-    g.stroke();
-  }
-  // top + bottom bars
-  g.fillStyle = "rgba(0,0,0,0.55)";
-  g.fillRect(0, 0, 1024, 64);
-  g.fillRect(0, 616, 1024, 64);
+  g.strokeRect(575, 365, 130, 130);
+  g.fillStyle = "rgba(0,0,0,0.5)";
+  g.fillRect(0, 0, 1024, 70);
+  g.fillRect(0, 690, 1024, 78);
   g.fillStyle = "#ffffff";
-  g.font = `700 36px ${MONO}`;
+  g.font = `700 34px ${MONO}`;
   g.textBaseline = "middle";
-  g.fillText("M", 24, 32);
-  g.fillText("RAW+J", 90, 32);
-  g.fillText("4K 60p", 300, 32);
-  g.fillText("[1250]", 820, 32);
-  g.fillText("1/250", 40, 648);
-  g.fillText("F2.8", 240, 648);
-  g.fillText("ISO 100", 400, 648);
+  g.fillText("P", 24, 36);
+  g.fillText("RAW+F", 80, 36);
+  g.fillText("PROVIA/STD", 260, 36);
+  g.fillText("3:2", 540, 36);
+  g.fillText("[ 1250 ]", 820, 36);
+  g.fillText("1/250", 40, 730);
+  g.fillText("F2.8", 230, 730);
+  g.fillText("ISO125", 380, 730);
   g.fillStyle = "#f5a524";
-  g.fillText("±0.0", 640, 648);
-  // battery
+  g.fillText("±0", 600, 730);
   g.strokeStyle = "#fff";
   g.lineWidth = 3;
-  g.strokeRect(930, 628, 64, 30);
+  g.strokeRect(930, 712, 64, 32);
   g.fillStyle = "#7CFC7C";
-  g.fillRect(934, 632, 44, 22);
-  // histogram
+  g.fillRect(934, 716, 44, 24);
   const r = rng(3);
   g.fillStyle = "rgba(0,0,0,0.45)";
-  g.fillRect(40, 90, 220, 110);
+  g.fillRect(40, 100, 220, 110);
   g.fillStyle = "rgba(255,255,255,0.85)";
   for (let i = 0; i < 100; i++) {
-    const h = 10 + Math.sin(i / 12) * 30 + Math.sin(i / 5) * 12 + r() * 30;
-    g.fillRect(50 + i * 2, 190 - Math.max(4, h + 30), 2, Math.max(4, h + 30));
+    const h = 30 + Math.sin(i / 12) * 30 + Math.sin(i / 5) * 12 + r() * 30;
+    g.fillRect(50 + i * 2, 200 - Math.max(4, h), 2, Math.max(4, h));
   }
-  // REC dot
-  g.fillStyle = "#ff3b30";
+  // level gauge
+  g.strokeStyle = "rgba(255,255,255,0.8)";
+  g.lineWidth = 3;
   g.beginPath();
-  g.arc(990, 100, 14, 0, Math.PI * 2);
-  g.fill();
+  g.moveTo(380, 384);
+  g.lineTo(480, 384);
+  g.moveTo(544, 384);
+  g.lineTo(644, 384);
+  g.stroke();
   return toTexture(c);
 }
 
@@ -264,7 +276,7 @@ export function pcbTexture() {
   g.fillRect(0, 0, 1024, 600);
   g.strokeStyle = "rgba(214,170,80,0.55)";
   g.lineCap = "round";
-  for (let i = 0; i < 220; i++) {
+  for (let i = 0; i < 260; i++) {
     let x = r() * 1024;
     let y = r() * 600;
     g.lineWidth = 1 + r() * 2.5;
@@ -278,36 +290,37 @@ export function pcbTexture() {
     g.stroke();
   }
   g.fillStyle = "#d6aa50";
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 600; i++) {
     g.beginPath();
     g.arc(r() * 1024, r() * 600, 1.5 + r() * 2.5, 0, Math.PI * 2);
     g.fill();
   }
   g.fillStyle = "rgba(255,255,255,0.8)";
   g.font = `600 22px ${MONO}`;
-  g.fillText("OL-MAIN  REV.C", 40, 570);
+  g.fillText("X-T5 MAIN PCB  REV.C", 40, 570);
   g.fillText("U1", 470, 250);
   g.fillText("C12  C13  C14", 700, 90);
   g.fillText("J3", 900, 520);
   return toTexture(c);
 }
 
-// Colour filter array shimmer for the image sensor.
+// X-Trans colour filter array (6×6 pattern) with a coating sheen.
 export function sensorTexture() {
-  const { c, g } = canvas(512, 384);
-  const colors = ["#6b1f2a", "#1f5a2a", "#1f5a2a", "#1c2a6b"];
+  const { c, g } = canvas(600, 400);
+  const P = ["GBGGRG", "RGRBGB", "GBGGRG", "GRGGBG", "BGBRGR", "GRGGBG"];
+  const col: Record<string, string> = { R: "#6b1f2a", G: "#1f5a2a", B: "#1c2a6b" };
   const s = 4;
-  for (let y = 0; y < 384; y += s)
-    for (let x = 0; x < 512; x += s) {
-      g.fillStyle = colors[((y / s) % 2) * 2 + ((x / s) % 2)];
+  for (let y = 0; y < 400; y += s)
+    for (let x = 0; x < 600; x += s) {
+      g.fillStyle = col[P[(y / s) % 6][(x / s) % 6]];
       g.fillRect(x, y, s, s);
     }
-  const sheen = g.createLinearGradient(0, 0, 512, 384);
+  const sheen = g.createLinearGradient(0, 0, 600, 400);
   sheen.addColorStop(0, "rgba(120,60,200,0.35)");
   sheen.addColorStop(0.5, "rgba(20,160,160,0.25)");
   sheen.addColorStop(1, "rgba(200,120,40,0.35)");
   g.fillStyle = sheen;
-  g.fillRect(0, 0, 512, 384);
+  g.fillRect(0, 0, 600, 400);
   return toTexture(c);
 }
 
@@ -324,9 +337,9 @@ export function labelTexture(
   g.fillRect(0, 0, w, h);
   if (stripe) {
     g.fillStyle = stripe;
-    g.fillRect(0, h * 0.72, w, h * 0.1);
+    g.fillRect(0, h * 0.74, w, h * 0.09);
   }
-  let y = h * 0.22;
+  let y = h * 0.2;
   for (const l of lines) {
     g.fillStyle = l.color ?? "#f2f2f2";
     g.font = `${l.weight ?? 700} ${l.size}px ${l.mono ? MONO : SANS}`;

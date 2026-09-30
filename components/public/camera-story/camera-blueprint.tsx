@@ -31,10 +31,10 @@ export function CameraBlueprint({ className }: { className?: string }) {
       </g>
       <g className="fill-muted-foreground/80 font-mono" stroke="none" fontSize="9" letterSpacing="1">
         <text x="200" y="258" textAnchor="middle">
-          128 MM
+          129.5 MM
         </text>
         <text x="362" y="153">
-          86
+          91
         </text>
         <text x="296" y="143">
           ƒ/2.8

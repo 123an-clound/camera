@@ -26,25 +26,25 @@ const STORY = [
     kicker: "Ống kính",
     title: "Soi từng thấu kính",
     body: "Mỗi ống kính được kiểm tra nấm mốc, bụi và hiệu chỉnh lấy nét trước và sau mỗi lượt thuê.",
-    spec: "14 thấu kính · 9 lá khẩu · ƒ/2.8",
+    spec: "XF18-55mm · 14 thấu kính · 7 lá khẩu",
   },
   {
     kicker: "Màn trập",
     title: "Shutter count minh bạch",
     body: "Số lần chụp được ghi rõ trên từng máy, bạn biết chính xác thiết bị mình nhận.",
-    spec: "1/8000s · 500K chu kỳ",
+    spec: "1/8000s cơ · 1/180000s điện tử",
   },
   {
     kicker: "Cảm biến",
     title: "Cảm biến sạch như mới",
     body: "Vệ sinh cảm biến định kỳ, không một hạt bụi nào lọt vào khung hình của bạn.",
-    spec: "Full-frame 24MP · IBIS 5 trục",
+    spec: "X-Trans CMOS 5 HR · 40.2MP · IBIS 7 stop",
   },
   {
     kicker: "Phụ kiện",
     title: "Đủ bộ, sẵn sàng bấm máy",
-    body: "Mỗi lượt thuê kèm 2 pin sạc đầy, sạc, thẻ nhớ 128GB và túi chống sốc.",
-    spec: "2× pin · 128GB · túi",
+    body: "Mỗi lượt thuê kèm 2 pin NP-W235 sạc đầy, sạc, thẻ nhớ 128GB và túi chống sốc.",
+    spec: "2× NP-W235 · 128GB · túi",
   },
 ] as const;
 
@@ -208,7 +208,7 @@ function PinnedStory({ title, subtitle }: { title: string; subtitle: string }) {
           <span className="flex items-center gap-2">
             <span className="size-2 animate-pulse rounded-full bg-red-500" /> REC
           </span>
-          <span>ISO 100 · 1/250 · ƒ/2.8 · AWB</span>
+          <span>FUJIFILM X-T5 · ISO 125 · 1/250 · ƒ/2.8</span>
           <span>
             FRAME <motion.span className="text-primary">{frame}</motion.span>/{TOTAL_FRAMES}
           </span>

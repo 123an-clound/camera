@@ -323,3 +323,74 @@ export function boxFaces(
 ) {
   return [faces.px ?? base, faces.nx ?? base, faces.py ?? base, faces.ny ?? base, faces.pz ?? base, faces.nz ?? base];
 }
+
+// Knurled dial standing on a surface (axis y): body, instanced ridges, optional printed cap.
+export function Dial({
+  r,
+  h,
+  body,
+  ridge,
+  cap,
+  ridges = 60,
+  position,
+}: {
+  r: number;
+  h: number;
+  body: THREE.Material;
+  ridge: THREE.Material;
+  cap?: THREE.Material;
+  ridges?: number;
+  position?: Vec3;
+}) {
+  const mats = useMemo(() => [body, cap ?? body, body], [body, cap]);
+  return (
+    <group position={position} rotation={[-HALF_PI, 0, 0]}>
+      <Cyl r={r} len={h} material={mats} position={[0, 0, h / 2]} />
+      <RadialInstances count={ridges} radius={r} size={[0.011, 0.012, h * 0.8]} material={ridge} position={[0, 0, h / 2]} />
+    </group>
+  );
+}
+
+// Flat lettering/label plane (transparent decal material), facing +z unless rotated.
+export function Decal({
+  material,
+  size,
+  position,
+  rotation,
+}: {
+  material: THREE.Material;
+  size: [number, number];
+  position: Vec3;
+  rotation?: Vec3;
+}) {
+  return (
+    <mesh position={position} rotation={rotation} material={material}>
+      <planeGeometry args={size} />
+    </mesh>
+  );
+}
+
+// Round push button along +z (or -z with `back`) with a chamfered collar.
+export function Button({
+  r,
+  h = 0.03,
+  material,
+  collar,
+  position,
+  back = false,
+}: {
+  r: number;
+  h?: number;
+  material: THREE.Material;
+  collar?: THREE.Material;
+  position: Vec3;
+  back?: boolean;
+}) {
+  const d = back ? -1 : 1;
+  return (
+    <group position={position}>
+      {collar && <Tube rOuter={r + 0.014} rInner={r} len={h * 0.6} material={collar} position={[0, 0, (d * h) / 4]} />}
+      <Cyl r={r} len={h} material={material} segments={28} position={[0, 0, (d * h) / 2]} />
+    </group>
+  );
+}

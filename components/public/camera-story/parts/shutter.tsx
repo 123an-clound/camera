@@ -2,15 +2,16 @@
 
 import type { MotionValue } from "framer-motion";
 import type { Vec3 } from "../explode";
-import { LENS_X } from "./body";
+import { LENS_X, LENS_Y } from "./body";
 import type { CameraMaterials } from "./materials";
 import { Cyl, Part, RadialInstances, Screw, Spring, Tag } from "./primitives";
 
 const C = 1; // shutter chapter
 const OUT: Vec3 = [1.2, 1.75, 0.5];
 
-// Focal-plane shutter unit: frame, actuator motor, gear train, springs; the two curtains'
-// blades fan apart as separate parts.
+// Focal-plane shutter unit (APS-C opening): frame, actuator motor, gear train, springs;
+// the two curtains' blades fan apart as separate parts.
+const S = 0.8; // unit scale relative to the full-frame layout
 export function Shutter({ p, m }: { p: MotionValue<number>; m: CameraMaterials }) {
   const blades = [0, 1, 2, 3, 4, 5, 6, 7];
   const screws: Vec3[] = [
@@ -21,7 +22,8 @@ export function Shutter({ p, m }: { p: MotionValue<number>; m: CameraMaterials }
   ];
   return (
     <group>
-      <Part progress={p} chapter={C} from={[LENS_X, 0, 0.24]} to={OUT}>
+      <Part progress={p} chapter={C} from={[LENS_X, LENS_Y, 0.22]} to={OUT}>
+        <group scale={S}>
         {/* frame around the 36×24 opening */}
         {(
           [
@@ -65,36 +67,37 @@ export function Shutter({ p, m }: { p: MotionValue<number>; m: CameraMaterials }
         {screws.map((s) => (
           <Screw key={s.join()} position={s} r={0.018} material={m.chrome} slot={m.matteBlack} />
         ))}
+        </group>
       </Part>
 
       {blades.map((i) => {
         const upper = i < 4;
         const k = upper ? i : i - 4;
-        const y0 = upper ? 0.05 + k * 0.05 : -0.05 - k * 0.05;
-        const y1 = upper ? 0.35 + k * 0.17 : -0.35 - k * 0.17;
+        const y0 = LENS_Y + (upper ? 0.04 + k * 0.04 : -0.04 - k * 0.04);
+        const y1 = upper ? 0.3 + k * 0.14 : -0.3 - k * 0.14;
         return (
           <Part
             key={i}
             progress={p}
             chapter={C}
-            from={[LENS_X, y0, 0.27 + i * 0.002]}
+            from={[LENS_X, y0, 0.25 + i * 0.002]}
             to={[OUT[0] + 0.05, OUT[1] + y1, OUT[2] + 0.08 + i * 0.03]}
             rotTo={[0, 0, (upper ? 1 : -1) * (0.06 + k * 0.05)]}
           >
             <mesh material={k % 2 ? m.metal : m.blackMetal}>
-              <boxGeometry args={[0.78, 0.13, 0.004]} />
+              <boxGeometry args={[0.62, 0.1, 0.004]} />
             </mesh>
             {/* linkage arm + rivet */}
-            <mesh position={[-0.42, upper ? 0.05 : -0.05, 0]} rotation={[0, 0, upper ? 0.5 : -0.5]} material={m.metal}>
+            <mesh position={[-0.34, upper ? 0.04 : -0.04, 0]} rotation={[0, 0, upper ? 0.5 : -0.5]} material={m.metal}>
               <boxGeometry args={[0.16, 0.025, 0.004]} />
             </mesh>
-            <Cyl r={0.012} len={0.01} material={m.chrome} segments={12} position={[-0.36, 0, 0.004]} />
+            <Cyl r={0.012} len={0.01} material={m.chrome} segments={12} position={[-0.29, 0, 0.004]} />
           </Part>
         );
       })}
 
-      <Tag progress={p} chapter={C} position={[1.15, 2.55, 0.5]}>
-        Màn trập 1/8000s · 500K chu kỳ
+      <Tag progress={p} chapter={C} position={[0.75, 2.55, 0.5]}>
+        Màn trập 1/8000s · 1/180000s
       </Tag>
     </group>
   );

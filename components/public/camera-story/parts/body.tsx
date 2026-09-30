@@ -1,133 +1,155 @@
 "use client";
 
+import { useMemo } from "react";
 import { RoundedBox } from "@react-three/drei";
 import type { MotionValue } from "framer-motion";
 import type { Vec3 } from "../explode";
 import type { CameraMaterials } from "./materials";
-import { Cyl, Part, RadialInstances, Screw, Tube } from "./primitives";
+import { BoxInstances, Button, Cyl, Dial, Part, RadialInstances, Screw, Tube } from "./primitives";
 
-export const LENS_X = 0.1;
-export const LENS_Y = -0.02;
+// Fujifilm X-T5 proportions (129.5 × 91 × 63.8 mm), 1 unit ≈ 54 mm. Front faces +z,
+// the grip is on -x (viewer's left when looking at the front).
+export const LENS_X = 0.12;
+export const LENS_Y = -0.12;
+export const TOP = 0.62; // top of the silver top cover, where the dials stand
 
-// Static chassis: magnesium frame, grip, strap lugs, side doors, tripod socket.
+// Static chassis: magnesium frame, grip, front command dial, strap clips, side doors,
+// silver base plate with tripod socket and battery door.
 export function Body({ m }: { m: CameraMaterials }) {
-  const bottomScrews: Vec3[] = [
-    [-0.55, -0.71, 0.18],
-    [0.75, -0.71, 0.18],
-    [0.75, -0.71, -0.18],
-    [-0.55, -0.71, -0.18],
-  ];
+  const speaker = useMemo<Vec3[]>(() => {
+    const out: Vec3[] = [];
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) out.push([1.207, -0.5 + r * 0.03, -0.12 + c * 0.03]);
+    return out;
+  }, []);
   return (
     <group>
-      <RoundedBox args={[2.4, 1.4, 0.6]} radius={0.08} smoothness={4} material={m.magnesium} />
+      <RoundedBox args={[2.3, 1.26, 0.5]} radius={0.06} smoothness={4} position={[0, -0.08, 0]} material={m.magnesium} />
 
-      {/* Grip: leatherette wrap with a finger ridge and front command dial */}
-      <RoundedBox args={[0.55, 1.5, 0.5]} radius={0.2} smoothness={5} position={[-1.05, -0.02, 0.42]} material={m.leather} />
-      <RoundedBox args={[0.5, 0.08, 0.46]} radius={0.03} smoothness={3} position={[-1.05, 0.28, 0.45]} material={m.rubber} />
-      <group position={[-1.0, 0.64, 0.5]} rotation={[Math.PI / 2, 0, 0]}>
-        <Cyl r={0.15} len={0.05} material={m.knurled} />
-        <RadialInstances count={40} radius={0.152} size={[0.008, 0.01, 0.05]} material={m.blackMetal} />
-      </group>
+      {/* Grip + front command dial peeking out of its top */}
+      <RoundedBox args={[0.4, 1.0, 0.2]} radius={0.09} smoothness={5} position={[-0.95, -0.14, 0.38]} material={m.leather} />
+      <Dial r={0.1} h={0.05} body={m.knurled} ridge={m.blackMetal} ridges={36} position={[-0.92, 0.33, 0.33]} />
 
-      {/* Strap lugs */}
-      {[-1.24, 1.24].map((x) => (
-        <group key={x} position={[x, 0.52, 0]} rotation={[0, Math.PI / 2, 0]}>
-          <mesh material={m.metal}>
-            <torusGeometry args={[0.065, 0.018, 12, 32]} />
+      {/* Strap clips */}
+      {[-1.215, 1.215].map((x) => (
+        <group key={x} position={[x, 0.4, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <mesh material={m.silver}>
+            <torusGeometry args={[0.06, 0.016, 12, 32]} />
           </mesh>
         </group>
       ))}
 
-      {/* Right side: port door (upper) and card door (lower), rubber with ridges */}
-      <RoundedBox args={[0.03, 0.46, 0.34]} radius={0.012} smoothness={2} position={[1.215, 0.22, 0.04]} material={m.rubber} />
-      {[0.34, 0.22, 0.1].map((y) => (
-        <mesh key={y} position={[1.232, y, 0.04]} material={m.shellDark}>
-          <boxGeometry args={[0.006, 0.012, 0.24]} />
-        </mesh>
+      {/* +x side: two connector covers (mic/remote, USB-C/HDMI), speaker */}
+      {[0.16, -0.22].map((y) => (
+        <group key={y}>
+          <RoundedBox args={[0.03, 0.32, 0.4]} radius={0.012} smoothness={2} position={[1.19, y, 0.02]} material={m.rubber} />
+          <mesh position={[1.207, y + 0.12, 0.02]} material={m.shellDark}>
+            <boxGeometry args={[0.006, 0.012, 0.3]} />
+          </mesh>
+        </group>
       ))}
-      <RoundedBox args={[0.03, 0.44, 0.34]} radius={0.012} smoothness={2} position={[1.215, -0.28, -0.04]} material={m.shell} />
-      <mesh position={[1.233, -0.28, 0.1]} material={m.metal}>
-        <boxGeometry args={[0.006, 0.1, 0.03]} />
+      <BoxInstances items={speaker} size={[0.006, 0.012, 0.012]} material={m.matteBlack} />
+
+      {/* -x side: dual SD card-slot cover with latch */}
+      <RoundedBox args={[0.03, 0.62, 0.42]} radius={0.012} smoothness={2} position={[-1.19, -0.14, -0.02]} material={m.shellDark} />
+      <mesh position={[-1.2, -0.14, -0.235]} material={m.silverDark}>
+        <boxGeometry args={[0.02, 0.12, 0.02]} />
       </mesh>
 
-      {/* Bottom: tripod socket, battery door with latch, screws */}
-      <group position={[LENS_X, -0.705, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <Tube rOuter={0.09} rInner={0.035} len={0.02} material={m.metal} />
-        <Cyl r={0.035} len={0.018} material={m.matteBlack} segments={24} />
+      {/* Base plate: tripod socket on the lens axis, battery door under the grip */}
+      <RoundedBox args={[2.4, 0.08, 0.62]} radius={0.03} smoothness={3} position={[0, -0.69, 0]} material={m.silver} />
+      <group position={[LENS_X, -0.73, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <Tube rOuter={0.08} rInner={0.03} len={0.012} material={m.silverDark} />
+        <Cyl r={0.03} len={0.01} material={m.matteBlack} segments={24} />
       </group>
-      <RoundedBox args={[0.46, 0.02, 0.44]} radius={0.008} smoothness={2} position={[-1.05, -0.772, 0.42]} material={m.shell} />
-      <mesh position={[-1.05, -0.785, 0.58]} material={m.metal}>
-        <boxGeometry args={[0.12, 0.012, 0.05]} />
+      <mesh position={[-0.8, -0.733, 0.02]} material={m.shellDark}>
+        <boxGeometry args={[0.46, 0.008, 0.4]} />
       </mesh>
-      {bottomScrews.map((p) => (
+      <mesh position={[-0.8, -0.738, -0.2]} material={m.silverDark}>
+        <boxGeometry args={[0.14, 0.01, 0.04]} />
+      </mesh>
+      {(
+        [
+          [0.7, -0.735, 0.2],
+          [0.7, -0.735, -0.2],
+          [-0.35, -0.735, 0.2],
+        ] as Vec3[]
+      ).map((p) => (
         <group key={p.join()} position={p} rotation={[Math.PI / 2, 0, 0]}>
-          <Screw position={[0, 0, 0]} material={m.metal} slot={m.matteBlack} />
+          <Screw position={[0, 0, 0]} r={0.014} material={m.silverDark} slot={m.matteBlack} />
         </group>
       ))}
     </group>
   );
 }
 
-// Front plate carrying the lens mount; swings open during the shutter chapter.
+// Leatherette front plate carrying the X mount; swings open during the shutter chapter.
 export function FrontPlate({ p, m }: { p: MotionValue<number>; m: CameraMaterials }) {
-  const screws: Vec3[] = [
-    [-0.72, 0.62, 0.052],
-    [1.12, 0.62, 0.052],
-    [1.12, -0.64, 0.052],
-    [-0.72, -0.64, 0.052],
-  ];
   return (
-    <Part progress={p} chapter={1} from={[0, 0, 0.36]} to={[-1.7, 0.1, 1.5]} rotTo={[0, 0.9, 0]}>
-      <RoundedBox args={[2.46, 1.46, 0.1]} radius={0.04} smoothness={3} material={m.shell} />
-      {/* Leatherette inlay right of the mount */}
-      <RoundedBox args={[0.4, 1.22, 0.014]} radius={0.01} smoothness={2} position={[0.97, -0.06, 0.054]} material={m.leather} />
+    <Part progress={p} chapter={1} from={[0, 0, 0.3]} to={[-1.7, 0.1, 1.5]} rotTo={[0, 0.9, 0]}>
+      <RoundedBox args={[2.4, 1.08, 0.07]} radius={0.03} smoothness={3} position={[0, -0.11, 0]} material={m.leather} />
 
-      {/* Bayonet mount: chrome flange, black throat, three tabs, gold contacts, index dot */}
-      <group position={[LENS_X, LENS_Y, 0.07]}>
-        <Tube rOuter={0.68} rInner={0.56} len={0.05} material={m.metal} />
-        <Tube rOuter={0.57} rInner={0.54} len={0.12} material={m.matteBlack} position={[0, 0, -0.04]} />
-        <RadialInstances count={3} radius={0.575} size={[0.28, 0.035, 0.02]} material={m.metal} position={[0, 0, 0.012]} />
+      {/* X mount: silver ring, chrome bayonet flange, black throat, tabs, 10 contacts, screws */}
+      <group position={[LENS_X, LENS_Y, 0.04]}>
+        <Tube rOuter={0.53} rInner={0.49} len={0.05} material={m.silver} position={[0, 0, -0.005]} />
+        <Tube rOuter={0.49} rInner={0.4} len={0.04} material={m.chrome} />
+        <Tube rOuter={0.41} rInner={0.38} len={0.16} material={m.matteBlack} position={[0, 0, -0.08]} />
+        <RadialInstances
+          count={3}
+          radius={0.405}
+          size={[0.22, 0.03, 0.014]}
+          material={m.metal}
+          position={[0, 0, 0.004]}
+          rotation={[0, 0, 0.5]}
+        />
         <RadialInstances
           count={10}
-          radius={0.5}
-          arc={1.1}
-          startAngle={-Math.PI / 2 - 0.55}
-          size={[0.035, 0.05, 0.012]}
+          radius={0.355}
+          arc={1.2}
+          startAngle={-Math.PI / 2 - 0.6}
+          size={[0.028, 0.045, 0.012]}
           material={m.gold}
-          position={[0, 0, -0.02]}
+          position={[0, 0, -0.03]}
         />
-        {[0, 1, 2, 3, 4, 5].map((i) => {
-          const a = (i / 6) * Math.PI * 2 + 0.3;
+        {[0, 1, 2, 3].map((i) => {
+          const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
           return (
             <Screw
               key={i}
-              position={[Math.cos(a) * 0.625, Math.sin(a) * 0.625, 0.03]}
-              r={0.014}
+              position={[Math.cos(a) * 0.445, Math.sin(a) * 0.445, 0.022]}
+              r={0.013}
               material={m.chrome}
               slot={m.matteBlack}
             />
           );
         })}
-        <mesh position={[0.5, 0.5, 0.03]} material={m.amber}>
-          <sphereGeometry args={[0.025, 16, 16]} />
+        <mesh position={[0.36, 0.36, 0.025]} material={m.white}>
+          <sphereGeometry args={[0.018, 12, 12]} />
         </mesh>
       </group>
 
-      {/* Lens release button, AF-assist lamp, two custom buttons */}
-      <group position={[0.86, -0.4, 0.07]}>
-        <Cyl r={0.075} len={0.035} material={m.metal} />
-        <Cyl r={0.06} len={0.02} material={m.shellDark} position={[0, 0, 0.022]} />
+      {/* Fn2, AF-assist/tally lamp, lens release, sync terminal, focus-mode selector */}
+      <Button r={0.042} h={0.025} material={m.shellDark} collar={m.silverDark} position={[-0.5, 0.14, 0.035]} />
+      <Cyl r={0.036} len={0.012} material={m.amberDim} segments={24} position={[-0.5, 0.31, 0.04]} />
+      <Button r={0.058} h={0.03} material={m.silver} position={[-0.47, -0.52, 0.035]} />
+      <group position={[0.84, 0.22, 0.035]}>
+        <Tube rOuter={0.06} rInner={0.035} len={0.03} material={m.silverDark} position={[0, 0, 0.015]} />
+        <Cyl r={0.045} len={0.045} material={m.rubber} segments={24} position={[0, 0, 0.025]} />
       </group>
-      <group position={[-0.62, 0.5, 0.06]}>
-        <Cyl r={0.05} len={0.02} material={m.blackMetal} segments={24} />
-        <Cyl r={0.038} len={0.012} material={m.amberDim} segments={24} position={[0, 0, 0.012]} />
+      <group position={[0.84, -0.5, 0.035]}>
+        <Cyl r={0.07} len={0.02} material={m.shellDark} segments={32} position={[0, 0, 0.01]} />
+        <mesh position={[0.05, 0, 0.03]} rotation={[0, 0, -0.3]} material={m.shellDark}>
+          <boxGeometry args={[0.12, 0.035, 0.03]} />
+        </mesh>
+        <RadialInstances
+          count={3}
+          radius={0.1}
+          arc={1.2}
+          startAngle={-0.6}
+          size={[0.012, 0.012, 0.004]}
+          material={m.white}
+          position={[0, 0, 0.004]}
+        />
       </group>
-      {[-0.28, -0.46].map((y) => (
-        <Cyl key={y} r={0.035} len={0.03} material={m.shellDark} segments={24} position={[-0.6, y, 0.065]} />
-      ))}
-      {screws.map((s) => (
-        <Screw key={s.join()} position={s} r={0.016} material={m.metal} slot={m.matteBlack} />
-      ))}
     </Part>
   );
 }
