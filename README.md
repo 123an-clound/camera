@@ -31,6 +31,7 @@ npm run dev                  # http://localhost:3000
 | `NEXT_PUBLIC_SUPABASE_URL` | Có | URL project Supabase |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Có | Khoá public (anon) — quyền do RLS quyết định |
 | `SUPABASE_SERVICE_ROLE_KEY` | Có | Chỉ dùng phía server; **không bao giờ** đưa ra client |
+| `NEXT_PUBLIC_GA_ID` | Không | Google Analytics 4 (`G-XXXXXXX`). Để trống = tắt analytics |
 | `NEXT_PUBLIC_SITE_URL` | Nên có | Domain chính thức (`https://...`) cho sitemap, robots, canonical, Open Graph. Nếu trống trên Vercel sẽ dùng domain production của project |
 
 Vercel tự cấp `VERCEL_ENV` / `VERCEL_PROJECT_PRODUCTION_URL`: bản preview tự `noindex` và robots chặn toàn bộ.

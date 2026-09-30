@@ -4,7 +4,7 @@ Ngày: 2026-09-30 · Branch: `feat/optical-lab-redesign` (chưa merge, chưa dep
 
 ## Kết luận
 
-**Bị chặn một phần — đủ điều kiện trong phạm vi đã kiểm chứng, chưa đủ để go-live** cho tới khi chủ dự án xử lý 3 mục ở phần "Blocker trước production" (domain chính thức, xác nhận quy tắc tính ngày thuê, kiểm tra admin sau đăng nhập). Không còn P0 nào mở. Một P1 hiệu năng (TBT trang chủ trên máy yếu mô phỏng) được giảm nhưng chưa đạt ngưỡng — có công tắc tắt 3D trong admin.
+**Bị chặn một phần — đủ điều kiện trong phạm vi đã kiểm chứng, chưa đủ để go-live** cho tới khi chủ dự án xử lý các mục ở "Blocker trước production" (push/deploy preview, domain chính thức, xác nhận quy tắc thuê, nội dung thật cho checklist pre-launch). Không còn P0 nào mở. Một P1 hiệu năng (TBT trang chủ trên máy yếu mô phỏng) được giảm nhưng chưa đạt ngưỡng — có công tắc tắt 3D trong admin.
 
 Phạm vi nghiệp vụ thực tế: web bán + cho thuê máy ảnh **không có thanh toán online**. Khách gửi *yêu cầu* (mua/thuê), shop gọi lại xác nhận, cọc và lịch nhận máy. Không có tài khoản khách hàng hay trang tra cứu đơn.
 
@@ -62,13 +62,49 @@ Hai lượt "sau" cho khoảng giá trị; LCP trang chủ dao động mạnh gi
 
 ## Chưa kiểm chứng / giới hạn
 
-- Giao diện admin sau đăng nhập (8 tab cài đặt, dashboard, chi tiết đơn, CSV, thao tác nhanh sản phẩm): cần mật khẩu của chủ shop — **chưa chạy thử trên trình duyệt**.
-- Luồng lưu cấu hình từ admin → hiển thị ngoài site: chưa ghi thử vào DB thật.
+- Admin: đã kiểm bằng tài khoản QA tạm (đã xoá sau test). Chưa bấm thử: lưu ghi chú/đổi trạng thái trên đơn thật, bật/tắt hiển thị sản phẩm đang bán (sẽ ảnh hưởng site production đang chạy), upload ảnh/model.
 - Deploy preview/production trên Vercel: chưa deploy (không tự deploy). Fallback `VERCEL_PROJECT_PRODUCTION_URL` và `noindex` preview chỉ kiểm bằng code + tài liệu Vercel.
 - Không có Search Console/CrUX → chưa có dữ liệu index/organic/field.
 - Rich Results Test / Schema validator cần URL public.
 - Rate limit là in-memory theo instance (đủ cho traffic nhỏ; nhiều instance cần Redis/Upstash).
 - Không có hệ thống lịch trống/đặt trùng máy thuê — shop kiểm tra thủ công khi gọi xác nhận.
+
+## Kiểm thử admin (bản production local, tài khoản QA tạm)
+
+Tạo user tạm qua Supabase Admin API + thêm vào `camera_admins`, đăng nhập bằng Playwright, rồi xoá user và mọi dữ liệu test (DB kiểm lại: 1 user, 1 admin, 6 sản phẩm, 0 hàng `cfg_*`). Mật khẩu tạm có xuất hiện trong log công cụ phiên làm việc; tài khoản đã bị xoá.
+
+- Dashboard, Yêu cầu, Chi tiết yêu cầu, Sản phẩm, Cài đặt (8 tab) hiển thị đúng.
+- Xuất CSV: 200, `text/csv`, có BOM UTF-8 (Excel đọc tiếng Việt), 1 dòng dữ liệu (file tải về đã xoá).
+- Lưu cấu hình: đổi màu nhấn sang cyan + bật thanh thông báo → site công khai đổi `--primary` và hiện thông báo ngay.
+- Link `javascript:alert(1)` trong menu → bị từ chối "Link phải bắt đầu bằng / hoặc https://".
+- Nhân bản sản phẩm → mở trang sửa bản sao (ẩn, "(bản sao)"); đã xoá bản sao.
+
+## Checklist pre-launch (20 mục)
+
+| # | Mục | Kết quả | Ghi chú |
+|---|---|---|---|
+| 1 | 404 riêng | ✅ | `app/not-found.tsx`, trả 404, có menu + CTA |
+| 2 | CTA trên màn đầu | ✅ | "Thuê máy ngay" / "Mua máy" ở hero |
+| 3 | Liên kết nội bộ | ✅ | Menu, footer, breadcrumb, sản phẩm liên quan |
+| 4 | Trang cảm ơn | ✅ | Màn hình "Đã gửi yêu cầu" + mã yêu cầu |
+| 5 | Breadcrumb | ✅ | Sản phẩm, chi tiết, giới thiệu, liên hệ, chính sách + BreadcrumbList |
+| 6 | Case study | ❌ | Cần nội dung thật từ shop |
+| 7 | FAQ ≥ 5 câu | ❌ | Đã có CMS + FAQPage JSON-LD; hiện 0 câu — shop nhập ở Cài đặt → Giới thiệu & FAQ |
+| 8 | Cam kết thời gian phản hồi | ⚠️ | Đã có trường "Cam kết thời gian phản hồi" (hiện ở giỏ + liên hệ); cần shop điền |
+| 9 | CTA dính trên mobile | ✅ | Nút gọi/Zalo nổi |
+| 10 | robots.txt | ✅ | Có sitemap; preview chặn toàn bộ |
+| 11 | Title riêng từng trang | ✅ | curl với UA Googlebot |
+| 12 | Meta description riêng | ✅ | Trang chủ dùng mô tả site (sửa ở Cài đặt → SEO) |
+| 13 | Ảnh chia sẻ | ✅ | `/og` sinh tự động 1200×630 khi chưa upload; sản phẩm dùng ảnh sản phẩm |
+| 14 | Bản đồ + chỉ đường | ✅ | Bấm để tải bản đồ + link Google Maps |
+| 15 | Đánh giá thật | ❌ | Cần review thật (Google Business Profile) — không tự tạo |
+| 16 | Alt ảnh | ✅ | Lighthouse image-alt đạt; ảnh trang trí `alt=""` |
+| 17 | LocalBusiness schema | ⚠️ | `Store` với tên, điện thoại, email, địa chỉ, MXH. Thiếu giờ mở cửa dạng chuẩn và toạ độ — cần shop cung cấp |
+| 18 | Chính sách bảo mật | ⚠️ | `/privacy` + link footer + dòng đồng ý ở form. Nội dung mặc định chỉ mô tả dữ liệu thu thập — cần shop thay bằng bản đã rà soát pháp lý (NĐ 13/2023) |
+| 19 | Analytics | ❌ | Đã tích hợp GA4 (chỉ bật khi có `NEXT_PUBLIC_GA_ID`); cần shop cung cấp Measurement ID. Có thể cần banner đồng ý cookie |
+| 20 | Ảnh đội ngũ | ❌ | Cần ảnh thật |
+
+Kết quả: ✅ 13/20 · ⚠️ 3 · ❌ 4 (đều cần nội dung/ID từ shop).
 
 ## Rủi ro còn lại
 
@@ -82,4 +118,5 @@ Hai lượt "sau" cho khoảng giá trị; LCP trang chủ dao động mạnh gi
 3. **Xác nhận chính sách tồn kho**: hiện chặn yêu cầu mua vượt tồn kho. Nếu shop nhận đặt trước khi hết hàng, cần bỏ điều kiện `OUT_OF_STOCK`.
 4. Đăng nhập admin, thử từng tab cài đặt và các công cụ đơn hàng/sản phẩm.
 5. Supabase Dashboard: bật **Leaked password protection**; cân nhắc tắt **Allow new users to sign up** nếu app nhà hàng không cần.
-6. Merge branch → deploy preview → chạy lại Lighthouse/Rich Results trên URL preview → promote.
+6. **Push branch** `feat/optical-lab-redesign` (lệnh push bị chặn bởi quyền của trợ lý — cần chủ dự án tự push) → Vercel tạo preview → chạy lại Lighthouse/Rich Results trên URL preview → merge → promote.
+7. Nội dung/ID cho checklist pre-launch: FAQ, case study, đánh giá thật, ảnh đội ngũ, thời gian phản hồi, GA4 ID, chính sách bảo mật đã rà soát, giờ mở cửa + toạ độ.
