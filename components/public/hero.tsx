@@ -1,6 +1,8 @@
 import { getActiveBanners } from "@/lib/banners";
 import { getSiteSettings, settingText } from "@/lib/site-settings";
 import { BannerSlider } from "@/components/public/banner-slider";
+import { Viewfinder } from "@/components/public/viewfinder";
+import { CameraStory } from "@/components/public/camera-story/camera-story";
 
 export async function Hero() {
   const [banners, settings] = await Promise.all([getActiveBanners(), getSiteSettings()]);
@@ -20,15 +22,15 @@ export async function Hero() {
         : [];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-8">
-      {slides.length > 0 ? (
-        <BannerSlider slides={slides} />
-      ) : (
-        <div className="flex h-[50vh] min-h-80 flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-700 px-6 text-center text-white">
-          <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">{title}</h1>
-          <p className="mt-3 max-w-lg text-white/85 md:text-lg">{subtitle}</p>
+    <>
+      <CameraStory title={title} subtitle={subtitle} />
+      {slides.length > 0 && (
+        <div className="mx-auto max-w-6xl px-4 pt-16">
+          <Viewfinder label="Ưu đãi · Live">
+            <BannerSlider slides={slides} />
+          </Viewfinder>
         </div>
       )}
-    </div>
+    </>
   );
 }

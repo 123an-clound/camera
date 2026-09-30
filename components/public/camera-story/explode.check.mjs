@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   CHAPTERS,
   activeChapter,
+  chapterFocus,
   explodeAmount,
   mix3,
   sampleKeyframes,
@@ -17,6 +18,12 @@ const lens = CHAPTERS[0];
 assert.equal(explodeAmount(0, lens.start, lens.end), 0);
 assert.equal(explodeAmount(lens.end, lens.start, lens.end), 1);
 assert.equal(explodeAmount(1, lens.start, lens.end), 0, "camera reassembles by the end");
+const settled = lens.end + (lens.end - lens.start);
+assert.ok(Math.abs(explodeAmount(settled, lens.start, lens.end, 0.2) - 0.2) < 1e-9, "tucks back to hold");
+assert.equal(explodeAmount(settled, lens.start, lens.end), 1, "default hold keeps parts out");
+assert.equal(chapterFocus(lens.start, lens.start, lens.end), 0);
+assert.equal(chapterFocus(lens.end, lens.start, lens.end), 1);
+assert.equal(chapterFocus(lens.end + 0.05, lens.start, lens.end), 0);
 
 assert.equal(activeChapter(0), -1);
 assert.equal(activeChapter((lens.start + lens.end) / 2), 0);

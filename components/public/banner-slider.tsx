@@ -42,7 +42,7 @@ export function BannerSlider({ slides }: { slides: Slide[] }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
           {(slide.title || slide.subtitle) && (
             <div className="absolute inset-x-0 bottom-0 space-y-2 p-8 text-white">
-              {slide.title && <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">{slide.title}</h1>}
+              {slide.title && <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">{slide.title}</h2>}
               {slide.subtitle && <p className="max-w-lg text-white/85 md:text-lg">{slide.subtitle}</p>}
             </div>
           )}
