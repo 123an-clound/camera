@@ -6,6 +6,8 @@ import { getBrands, getCategories, listProducts, type ProductFilters as Filters 
 export const metadata: Metadata = {
   title: "Sản phẩm",
   description: "Danh sách máy ảnh, ống kính, phụ kiện bán và cho thuê.",
+  // Filter/sort query strings are variants of the same listing.
+  alternates: { canonical: "/products" },
 };
 
 type SearchParams = { [key: string]: string | string[] | undefined };
@@ -45,8 +47,8 @@ export default async function ProductsPage({
         <p className="mt-12 text-center text-muted-foreground">Không tìm thấy sản phẩm phù hợp.</p>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {products.map((p, i) => (
+            <ProductCard key={p.id} product={p} priority={i < 2} />
           ))}
         </div>
       )}

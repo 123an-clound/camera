@@ -6,6 +6,9 @@ import { getFeaturedProducts, listProducts } from "@/lib/products";
 import type { ProductWithImages } from "@/lib/types";
 import { getSiteConfig } from "@/lib/site-config";
 import type { HomeSectionId } from "@/lib/site-config-schema";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 function ProductSection({
   index,

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { settingText } from "@/lib/site-settings";
 import { getSiteConfig } from "@/lib/site-config";
 
-export const metadata: Metadata = { title: "Giới thiệu" };
+export const metadata: Metadata = { title: "Giới thiệu", alternates: { canonical: "/about" } };
 
 export default async function AboutPage() {
   const { settings, about } = await getSiteConfig();

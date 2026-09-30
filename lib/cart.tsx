@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { lineTotal } from "@/lib/cart-logic";
 
 export type CartItem = {
   id: string; // `${type}:${productId}`
@@ -11,7 +12,7 @@ export type CartItem = {
   type: "sale" | "rent";
   unitPrice: number;
   quantity: number;
-  rentDays?: number;
+  rentDays?: number; // legacy; the billed days are always derived from rentStart/rentEnd
   rentStart?: string;
   rentEnd?: string;
 };
@@ -62,9 +63,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, hydrated]);
 
   const value = useMemo<CartContextValue>(() => {
-    const lineTotal = (item: CartItem) =>
-      item.type === "rent" ? item.unitPrice * (item.rentDays ?? 1) : item.unitPrice * item.quantity;
-
     return {
       items,
       addItem: (item) =>

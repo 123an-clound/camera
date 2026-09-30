@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+import { SITE_URL } from "@/lib/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();
@@ -10,9 +9,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select("slug, updated_at")
     .eq("is_active", true);
 
+  // Static pages carry no lastmod: we don't track when their content changes, and a
+  // lastmod of "now" on every request would be misleading.
   const staticRoutes: MetadataRoute.Sitemap = ["", "/products", "/about", "/contact"].map((path) => ({
     url: `${SITE_URL}${path}`,
-    lastModified: new Date(),
   }));
 
   const productRoutes: MetadataRoute.Sitemap = (products ?? []).map((p) => ({

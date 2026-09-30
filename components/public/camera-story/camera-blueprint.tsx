@@ -1,3 +1,12 @@
+// Positioned placeholder shown behind/instead of the 3D canvas.
+export function BlueprintBackdrop() {
+  return (
+    <div className="absolute inset-0 flex items-start justify-center pt-[12svh] md:items-center md:justify-end md:pr-[8vw] md:pt-0">
+      <CameraBlueprint className="w-[70vw] max-w-xl md:w-[42vw]" />
+    </div>
+  );
+}
+
 // Line-art camera used while the 3D scene loads, without WebGL, and for reduced motion.
 export function CameraBlueprint({ className }: { className?: string }) {
   return (

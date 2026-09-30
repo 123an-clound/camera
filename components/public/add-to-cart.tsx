@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,20 +8,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCart } from "@/lib/cart";
 import { formatVND } from "@/lib/format";
 import type { ProductWithImages } from "@/lib/types";
-
-function daysBetween(start: string, end: string) {
-  const ms = new Date(end).getTime() - new Date(start).getTime();
-  return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)));
-}
+import { rentalDays, todayInShop, validateRentalRange } from "@/lib/rental";
 
 export function AddToCart({ product, imageUrl }: { product: ProductWithImages; imageUrl: string | null }) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayInShop();
+  const startId = useId();
+  const endId = useId();
+  const maxQty = Math.max(1, Math.min(50, product.stock));
   const [rentStart, setRentStart] = useState(today);
   const [rentEnd, setRentEnd] = useState(today);
 
-  const rentDays = useMemo(() => daysBetween(rentStart, rentEnd), [rentStart, rentEnd]);
+  const rentDays = useMemo(() => rentalDays(rentStart, rentEnd), [rentStart, rentEnd]);
   const rentTotal = (product.rent_price_day ?? 0) * rentDays;
 
   function handleAddSale() {
@@ -39,8 +38,9 @@ export function AddToCart({ product, imageUrl }: { product: ProductWithImages; i
   }
 
   function handleAddRent() {
-    if (rentEnd < rentStart) {
-      toast.error("Ngày kết thúc phải sau ngày bắt đầu");
+    const invalid = validateRentalRange(rentStart, rentEnd, today);
+    if (invalid) {
+      toast.error(invalid);
       return;
     }
     addItem({
@@ -73,8 +73,10 @@ export function AddToCart({ product, imageUrl }: { product: ProductWithImages; i
         <Input
           type="number"
           min={1}
+          max={maxQty}
+          inputMode="numeric"
           value={quantity}
-          onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+          onChange={(e) => setQuantity(Math.min(maxQty, Math.max(1, Number(e.target.value) || 1)))}
           aria-label="Số lượng"
           className="w-20"
         />
@@ -93,12 +95,12 @@ export function AddToCart({ product, imageUrl }: { product: ProductWithImages; i
       )}
       <div className="flex gap-3">
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Từ ngày</label>
-          <Input type="date" value={rentStart} min={today} onChange={(e) => setRentStart(e.target.value)} />
+          <label htmlFor={startId} className="text-xs text-muted-foreground">Từ ngày</label>
+          <Input id={startId} type="date" value={rentStart} min={today} onChange={(e) => setRentStart(e.target.value)} />
         </div>
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Đến ngày</label>
-          <Input type="date" value={rentEnd} min={rentStart} onChange={(e) => setRentEnd(e.target.value)} />
+          <label htmlFor={endId} className="text-xs text-muted-foreground">Đến ngày</label>
+          <Input id={endId} type="date" value={rentEnd} min={rentStart} onChange={(e) => setRentEnd(e.target.value)} />
         </div>
       </div>
       <p className="text-sm">

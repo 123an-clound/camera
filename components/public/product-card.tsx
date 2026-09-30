@@ -9,7 +9,8 @@ import { ViewfinderCorners } from "@/components/public/viewfinder";
 import { formatVND } from "@/lib/format";
 import type { ProductWithImages } from "@/lib/types";
 
-export function ProductCard({ product }: { product: ProductWithImages }) {
+// `priority` for cards in the first viewport (their image is usually the LCP element).
+export function ProductCard({ product, priority = false }: { product: ProductWithImages; priority?: boolean }) {
   const reducedMotion = useReducedMotion();
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -55,6 +56,7 @@ export function ProductCard({ product }: { product: ProductWithImages }) {
                 alt={primaryImage.alt ?? product.name}
                 fill
                 sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+              priority={priority}
                 className="object-cover group-hover:scale-105"
               />
             ) : (

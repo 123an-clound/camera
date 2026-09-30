@@ -31,6 +31,8 @@ export function ProductFilters({ categories, brands }: { categories: Category[];
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
       <Input
+        type="search"
+        aria-label="Tìm sản phẩm theo tên"
         placeholder="Tìm theo tên..."
         defaultValue={searchParams.get("q") ?? ""}
         onKeyDown={(e) => {
@@ -41,7 +43,7 @@ export function ProductFilters({ categories, brands }: { categories: Category[];
       />
 
       <Select value={searchParams.get("mode") ?? ALL} onValueChange={(v) => setParam("mode", v)}>
-        <SelectTrigger>
+        <SelectTrigger aria-label="Hình thức: bán hoặc cho thuê">
           <SelectValue placeholder="Hình thức">{(v: string) => MODE_LABEL[v] ?? "Hình thức"}</SelectValue>
         </SelectTrigger>
         <SelectContent>
@@ -52,7 +54,7 @@ export function ProductFilters({ categories, brands }: { categories: Category[];
       </Select>
 
       <Select value={searchParams.get("category") ?? ALL} onValueChange={(v) => setParam("category", v)}>
-        <SelectTrigger>
+        <SelectTrigger aria-label="Danh mục">
           <SelectValue placeholder="Danh mục">{(v: string) => categoryLabel[v] ?? "Danh mục"}</SelectValue>
         </SelectTrigger>
         <SelectContent>
@@ -66,7 +68,7 @@ export function ProductFilters({ categories, brands }: { categories: Category[];
       </Select>
 
       <Select value={searchParams.get("brand") ?? ALL} onValueChange={(v) => setParam("brand", v)}>
-        <SelectTrigger>
+        <SelectTrigger aria-label="Hãng">
           <SelectValue placeholder="Hãng">{(v: string) => brandLabel[v] ?? "Hãng"}</SelectValue>
         </SelectTrigger>
         <SelectContent>
@@ -81,19 +83,25 @@ export function ProductFilters({ categories, brands }: { categories: Category[];
 
       <Input
         type="number"
+        inputMode="numeric"
+        min={0}
+        aria-label="Giá từ (VND)"
         placeholder="Giá từ"
         defaultValue={searchParams.get("minPrice") ?? ""}
         onBlur={(e) => setParam("minPrice", e.currentTarget.value)}
       />
       <Input
         type="number"
+        inputMode="numeric"
+        min={0}
+        aria-label="Giá đến (VND)"
         placeholder="Giá đến"
         defaultValue={searchParams.get("maxPrice") ?? ""}
         onBlur={(e) => setParam("maxPrice", e.currentTarget.value)}
       />
 
       <Select value={searchParams.get("sort") ?? "newest"} onValueChange={(v) => setParam("sort", v)}>
-        <SelectTrigger>
+        <SelectTrigger aria-label="Sắp xếp">
           <SelectValue placeholder="Sắp xếp">{(v: string) => SORT_LABEL[v] ?? "Sắp xếp"}</SelectValue>
         </SelectTrigger>
         <SelectContent>

@@ -34,7 +34,11 @@ export default async function PublicLayout({ children }: { children: ReactNode }
       {theme.enable_transition ? <PageTransition>{main}</PageTransition> : main}
       <Footer />
       {contact.floating_buttons && (
-        <FloatingContact phone={settingText(settings, "phone", "")} zalo={contact.zalo} />
+        <>
+          {/* Room so the last content/footer can scroll clear of the floating buttons on phones. */}
+          <div aria-hidden className="h-24 bg-card/40 md:hidden" />
+          <FloatingContact phone={settingText(settings, "phone", "")} zalo={contact.zalo} />
+        </>
       )}
     </div>
   );

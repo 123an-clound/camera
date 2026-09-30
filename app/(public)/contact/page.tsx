@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { settingText } from "@/lib/site-settings";
 import { getSiteConfig } from "@/lib/site-config";
+import { MapEmbed } from "@/components/public/map-embed";
 
-export const metadata: Metadata = { title: "Liên hệ" };
+export const metadata: Metadata = { title: "Liên hệ", alternates: { canonical: "/contact" } };
 
 export default async function ContactPage() {
   const { settings, contact } = await getSiteConfig();
@@ -52,14 +53,7 @@ export default async function ContactPage() {
           </div>
         )}
       </div>
-      {mapQuery && (
-        <iframe
-          title="Bản đồ cửa hàng"
-          src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
-          className="h-80 w-full rounded-xl border border-border/60"
-          loading="lazy"
-        />
-      )}
+      {mapQuery && <MapEmbed query={mapQuery} />}
     </div>
   );
 }

@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer, Sparkles } from "@react-three/drei";
 import type { MotionValue } from "framer-motion";
 import * as THREE from "three";
 import { CameraModel } from "./camera-model";
 import { sampleKeyframes, type Vec3 } from "./explode";
+import { BlueprintBackdrop } from "./camera-blueprint";
 
 type Frames = readonly { at: number; value: Vec3 }[];
 
@@ -88,30 +89,62 @@ function Rig({ progress }: { progress: MotionValue<number> }) {
   );
 }
 
+// Compile every shader program before the first frame (async where the browser supports
+// KHR_parallel_shader_compile) instead of stalling the main thread on the first render.
+function Precompile({ onReady }: { onReady: () => void }) {
+  const gl = useThree((s) => s.gl);
+  const scene = useThree((s) => s.scene);
+  const camera = useThree((s) => s.camera);
+  useLayoutEffect(() => {
+    let cancelled = false;
+    gl.compileAsync(scene, camera)
+      .catch(() => undefined)
+      .then(() => {
+        if (!cancelled) onReady();
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [gl, scene, camera, onReady]);
+  return null;
+}
+
 export default function CameraScene({ progress, active }: { progress: MotionValue<number>; active: boolean }) {
+  const [ready, setReady] = useState(false);
+  const markReady = useCallback(() => setReady(true), []);
   return (
-    <Canvas
-      aria-hidden
-      camera={{ position: [0, 0, 7.5], fov: 35 }}
-      dpr={[1, 1.5]}
-      gl={{ antialias: true, alpha: true }}
-      frameloop={active ? "always" : "never"}
-    >
-      {/* Studio reflections from local Lightformers (rendered once into a cube map).
-          No presets/files: those fetch HDRIs from a CDN that the CSP blocks. */}
-      <Environment resolution={256} frames={1}>
-        <Lightformer form="rect" intensity={3} position={[0, 5, 2]} rotation-x={Math.PI / 2} scale={[10, 3, 1]} />
-        <Lightformer form="rect" intensity={1.5} position={[-6, 1, 3]} rotation-y={Math.PI / 2} scale={[6, 4, 1]} />
-        <Lightformer form="rect" intensity={1.2} position={[6, 0, 2]} rotation-y={-Math.PI / 2} scale={[4, 6, 1]} />
-        <Lightformer form="ring" color="#f5a524" intensity={4} position={[-3, 2, -6]} scale={3} />
-        <Lightformer form="rect" color="#9cc4ff" intensity={0.8} position={[0, -4, 3]} rotation-x={-Math.PI / 2} scale={[8, 2, 1]} />
-      </Environment>
-      <ambientLight intensity={0.25} />
-      <directionalLight position={[4, 5, 6]} intensity={1.8} />
-      <directionalLight position={[-3, 2, -5]} intensity={2.2} color="#f5a524" />
-      <pointLight position={[2, -2, 3]} intensity={5} color="#f5a524" distance={8} />
-      <Rig progress={progress} />
-      <Sparkles count={40} scale={[8, 5, 4]} size={2} speed={0.25} opacity={0.35} color="#f5a524" />
-    </Canvas>
+    <>
+      {!ready && <BlueprintBackdrop />}
+      <Canvas
+        aria-hidden
+        camera={{ position: [0, 0, 7.5], fov: 35 }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, alpha: true }}
+        frameloop={active && ready ? "always" : "never"}
+        style={{ opacity: ready ? 1 : 0, transition: "opacity 600ms ease" }}
+        onCreated={(state) => {
+          // Shader error checks call getProgramInfoLog, which blocks until compilation finishes
+          // and defeats parallel compilation — keep them for development only.
+          state.gl.debug.checkShaderErrors = process.env.NODE_ENV !== "production";
+        }}
+      >
+        {/* Studio reflections from local Lightformers (rendered once into a cube map).
+            No presets/files: those fetch HDRIs from a CDN that the CSP blocks. */}
+        <Environment resolution={256} frames={1}>
+          <Lightformer form="rect" intensity={3} position={[0, 5, 2]} rotation-x={Math.PI / 2} scale={[10, 3, 1]} />
+          <Lightformer form="rect" intensity={1.5} position={[-6, 1, 3]} rotation-y={Math.PI / 2} scale={[6, 4, 1]} />
+          <Lightformer form="rect" intensity={1.2} position={[6, 0, 2]} rotation-y={-Math.PI / 2} scale={[4, 6, 1]} />
+          <Lightformer form="ring" color="#f5a524" intensity={4} position={[-3, 2, -6]} scale={3} />
+          <Lightformer form="rect" color="#9cc4ff" intensity={0.8} position={[0, -4, 3]} rotation-x={-Math.PI / 2} scale={[8, 2, 1]} />
+        </Environment>
+        <ambientLight intensity={0.25} />
+        <directionalLight position={[4, 5, 6]} intensity={1.8} />
+        <directionalLight position={[-3, 2, -5]} intensity={2.2} color="#f5a524" />
+        <pointLight position={[2, -2, 3]} intensity={5} color="#f5a524" distance={8} />
+        <Rig progress={progress} />
+        <Sparkles count={40} scale={[8, 5, 4]} size={2} speed={0.25} opacity={0.35} color="#f5a524" />
+        <Precompile onReady={markReady} />
+      </Canvas>
+    </>
   );
 }

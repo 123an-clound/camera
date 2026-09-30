@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   motion,
   useInView,
@@ -13,7 +13,7 @@ import {
 } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { ViewfinderCorners } from "@/components/public/viewfinder";
-import { CameraBlueprint } from "./camera-blueprint";
+import { BlueprintBackdrop, CameraBlueprint } from "./camera-blueprint";
 import { CHAPTERS, activeChapter } from "./explode";
 import type { SiteConfigGroups } from "@/lib/site-config-schema";
 
@@ -68,12 +68,24 @@ function useWebGLSupported() {
   return useSyncExternalStore(noopSubscribe, probeWebGL, () => true);
 }
 
-function BlueprintBackdrop() {
-  return (
-    <div className="absolute inset-0 flex items-start justify-center pt-[12svh] md:items-center md:justify-end md:pr-[8vw] md:pt-0">
-      <CameraBlueprint className="w-[70vw] max-w-xl md:w-[42vw]" />
-    </div>
-  );
+// Mount the heavy 3D scene only once the browser is idle after first paint, so the hero
+// text (the LCP element) and early interactions aren't blocked by three.js start-up.
+// Save-Data / very low-end devices keep the lightweight blueprint.
+function useIdleMount() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
+    // Save-Data and very low-end devices (≤2 cores or ≤2 GB) keep the static blueprint.
+    if (nav.connection?.saveData || (nav.hardwareConcurrency ?? 8) <= 2 || (nav.deviceMemory ?? 8) <= 2) return;
+    const run = () => setReady(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(run, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(run, 1200);
+    return () => window.clearTimeout(t);
+  }, []);
+  return ready;
 }
 
 function PrimaryCta({ href, children }: { href: string; children: React.ReactNode }) {
@@ -167,6 +179,7 @@ function PinnedStory({ hero, story }: { hero: HeroContent; story: StoryContent }
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.4 });
   const inView = useInView(ref, { margin: "200px 0px" });
   const webgl = useWebGLSupported();
+  const idle = useIdleMount();
   const [chapter, setChapter] = useState(-1);
   const frame = useTransform(progress, (v) => String(Math.round(v * TOTAL_FRAMES)).padStart(2, "0"));
   const hintOpacity = useTransform(progress, [0, 0.05], [1, 0]);
@@ -180,7 +193,7 @@ function PinnedStory({ hero, story }: { hero: HeroContent; story: StoryContent }
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_65%_50%,color-mix(in_oklch,var(--primary)_10%,transparent),transparent_55%)]" />
 
         <div className="absolute inset-0">
-          {webgl ? <CameraScene progress={progress} active={inView} /> : <BlueprintBackdrop />}
+          {webgl && idle ? <CameraScene progress={progress} active={inView} /> : <BlueprintBackdrop />}
         </div>
 
         {/* Viewfinder HUD */}

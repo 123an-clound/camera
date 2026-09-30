@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --no-warnings lib/rental.check.mjs && node --no-warnings lib/cart-logic.check.mjs && node --no-warnings lib/site-config.check.mjs && node --no-warnings components/public/camera-story/explode.check.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

@@ -5,6 +5,7 @@ import { OrderStatusSelect } from "@/components/admin/order-status-select";
 import { OrderNoteForm } from "@/components/admin/order-note-form";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { formatVND } from "@/lib/format";
+import { rentalDays } from "@/lib/rental";
 import type { OrderItem, OrderStatus } from "@/lib/types";
 import { deleteOrder } from "../actions";
 
@@ -15,10 +16,7 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
   if (!order) notFound();
 
   const items = order.camera_order_items as OrderItem[];
-  const days =
-    order.rent_start && order.rent_end
-      ? Math.max(1, Math.round((Date.parse(order.rent_end) - Date.parse(order.rent_start)) / 86_400_000) + 1)
-      : null;
+  const days = order.rent_start && order.rent_end ? rentalDays(order.rent_start, order.rent_end) : null;
 
   return (
     <div className="max-w-3xl space-y-6">
