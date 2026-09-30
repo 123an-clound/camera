@@ -72,6 +72,7 @@ export type Order = {
   rent_end: string | null;
   status: OrderStatus;
   total_estimate: number | null;
+  admin_note: string | null;
   created_at: string;
 };
 

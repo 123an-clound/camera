@@ -243,3 +243,64 @@ export async function setPrimaryImage(productId: string, imageId: string): Promi
   revalidatePath("/products");
   return { ok: true };
 }
+
+// Inline toggles on the products list.
+export async function setProductFlag(id: string, field: string, value: boolean): Promise<ActionState> {
+  if (field !== "is_active" && field !== "is_featured") return { error: "Trường không hợp lệ" };
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { error } = await auth.supabase.from("camera_products").update({ [field]: value }).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/products");
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+export async function setProductSort(id: string, sortOrder: number): Promise<ActionState> {
+  if (!Number.isInteger(sortOrder) || Math.abs(sortOrder) > 100_000) return { error: "Thứ tự không hợp lệ" };
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { error } = await auth.supabase.from("camera_products").update({ sort_order: sortOrder }).eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/products");
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+// Copy a product (hidden, "-copy" slug) with its image rows, then open it for editing.
+export async function duplicateProduct(id: string): Promise<ActionState> {
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
+
+  const { data: source } = await supabase.from("camera_products").select("*, camera_product_images(*)").eq("id", id).single();
+  if (!source) return { error: "Không tìm thấy sản phẩm" };
+
+  const images = source.camera_product_images;
+  const fields: Record<string, unknown> = { ...source };
+  for (const key of ["id", "created_at", "updated_at", "camera_product_images"]) delete fields[key];
+  const suffix = crypto.randomUUID().slice(0, 6);
+  const { data: copy, error } = await supabase
+    .from("camera_products")
+    .insert({ ...fields, name: `${source.name} (bản sao)`, slug: `${source.slug}-copy-${suffix}`, is_active: false, is_featured: false })
+    .select("id")
+    .single();
+  if (error || !copy) return { error: error?.message ?? "Không nhân bản được" };
+
+  if (images?.length) {
+    await supabase.from("camera_product_images").insert(
+      (images as { url: string; alt: string | null; sort_order: number; is_primary: boolean }[]).map((img) => ({
+        product_id: copy.id,
+        url: img.url,
+        alt: img.alt,
+        sort_order: img.sort_order,
+        is_primary: img.is_primary,
+      }))
+    );
+  }
+
+  revalidatePath("/admin/products");
+  redirect(`/admin/products/${copy.id}`);
+}

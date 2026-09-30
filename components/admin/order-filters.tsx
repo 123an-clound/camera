@@ -27,12 +27,17 @@ export function OrderFilters() {
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-wrap gap-3">
       <Input
-        placeholder="Tìm theo SĐT..."
-        defaultValue={searchParams.get("phone") ?? ""}
-        onBlur={(e) => setParam("phone", e.currentTarget.value)}
-        className="max-w-56"
+        type="search"
+        aria-label="Tìm yêu cầu"
+        placeholder="Tìm tên, SĐT, email… (Enter)"
+        defaultValue={searchParams.get("q") ?? ""}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") setParam("q", e.currentTarget.value);
+        }}
+        onBlur={(e) => setParam("q", e.currentTarget.value)}
+        className="max-w-72"
       />
       <Select value={searchParams.get("status") ?? ALL} onValueChange={(v) => setParam("status", v)}>
         <SelectTrigger className="w-44">
