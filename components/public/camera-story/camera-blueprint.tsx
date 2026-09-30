@@ -37,7 +37,7 @@ export function CameraBlueprint({ className }: { className?: string }) {
           86
         </text>
         <text x="296" y="143">
-          ƒ/1.8
+          ƒ/2.8
         </text>
       </g>
     </svg>

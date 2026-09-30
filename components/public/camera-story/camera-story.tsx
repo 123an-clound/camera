@@ -26,19 +26,19 @@ const STORY = [
     kicker: "Ống kính",
     title: "Soi từng thấu kính",
     body: "Mỗi ống kính được kiểm tra nấm mốc, bụi và hiệu chỉnh lấy nét trước và sau mỗi lượt thuê.",
-    spec: "7 thấu kính · ƒ/1.8 · AF",
+    spec: "14 thấu kính · 9 lá khẩu · ƒ/2.8",
   },
   {
     kicker: "Màn trập",
     title: "Shutter count minh bạch",
     body: "Số lần chụp được ghi rõ trên từng máy, bạn biết chính xác thiết bị mình nhận.",
-    spec: "1/8000s · 200K+ chu kỳ",
+    spec: "1/8000s · 500K chu kỳ",
   },
   {
     kicker: "Cảm biến",
     title: "Cảm biến sạch như mới",
     body: "Vệ sinh cảm biến định kỳ, không một hạt bụi nào lọt vào khung hình của bạn.",
-    spec: "Full-frame · 24MP",
+    spec: "Full-frame 24MP · IBIS 5 trục",
   },
   {
     kicker: "Phụ kiện",
@@ -208,7 +208,7 @@ function PinnedStory({ title, subtitle }: { title: string; subtitle: string }) {
           <span className="flex items-center gap-2">
             <span className="size-2 animate-pulse rounded-full bg-red-500" /> REC
           </span>
-          <span>ISO 100 · 1/250 · ƒ/1.8 · AWB</span>
+          <span>ISO 100 · 1/250 · ƒ/2.8 · AWB</span>
           <span>
             FRAME <motion.span className="text-primary">{frame}</motion.span>/{TOTAL_FRAMES}
           </span>

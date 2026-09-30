@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Sparkles } from "@react-three/drei";
+import { Environment, Lightformer, Sparkles } from "@react-three/drei";
 import type { MotionValue } from "framer-motion";
 import * as THREE from "three";
 import { CameraModel } from "./camera-model";
@@ -97,13 +97,19 @@ export default function CameraScene({ progress, active }: { progress: MotionValu
       gl={{ antialias: true, alpha: true }}
       frameloop={active ? "always" : "never"}
     >
-      {/* Plain lights only: <Environment> presets fetch HDRIs from a CDN the CSP blocks. */}
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[4, 5, 6]} intensity={2.8} />
-      <directionalLight position={[0, 0.5, 8]} intensity={0.8} />
-      <directionalLight position={[-5, 1, 3]} intensity={0.5} color="#9cc4ff" />
-      <directionalLight position={[-3, 2, -5]} intensity={2.4} color="#f5a524" />
-      <pointLight position={[2, -2, 3]} intensity={6} color="#f5a524" distance={8} />
+      {/* Studio reflections from local Lightformers (rendered once into a cube map).
+          No presets/files: those fetch HDRIs from a CDN that the CSP blocks. */}
+      <Environment resolution={256} frames={1}>
+        <Lightformer form="rect" intensity={3} position={[0, 5, 2]} rotation-x={Math.PI / 2} scale={[10, 3, 1]} />
+        <Lightformer form="rect" intensity={1.5} position={[-6, 1, 3]} rotation-y={Math.PI / 2} scale={[6, 4, 1]} />
+        <Lightformer form="rect" intensity={1.2} position={[6, 0, 2]} rotation-y={-Math.PI / 2} scale={[4, 6, 1]} />
+        <Lightformer form="ring" color="#f5a524" intensity={4} position={[-3, 2, -6]} scale={3} />
+        <Lightformer form="rect" color="#9cc4ff" intensity={0.8} position={[0, -4, 3]} rotation-x={-Math.PI / 2} scale={[8, 2, 1]} />
+      </Environment>
+      <ambientLight intensity={0.25} />
+      <directionalLight position={[4, 5, 6]} intensity={1.8} />
+      <directionalLight position={[-3, 2, -5]} intensity={2.2} color="#f5a524" />
+      <pointLight position={[2, -2, 3]} intensity={5} color="#f5a524" distance={8} />
       <Rig progress={progress} />
       <Sparkles count={40} scale={[8, 5, 4]} size={2} speed={0.25} opacity={0.35} color="#f5a524" />
     </Canvas>
