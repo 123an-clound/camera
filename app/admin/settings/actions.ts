@@ -5,7 +5,7 @@ import { getAdminClient } from "@/lib/admin-auth";
 import { uploadToBucket } from "@/lib/storage";
 import type { ActionState } from "@/app/admin/products/actions";
 
-const TEXT_KEYS = ["store_name", "hero_title", "hero_subtitle", "phone", "address", "email", "facebook_url", "about"];
+const TEXT_KEYS = ["store_name", "hero_title", "hero_subtitle", "phone", "address", "email", "facebook_url", "about", "privacy_policy"];
 const IMAGE_KEYS = ["hero_image", "logo_url"];
 
 export async function updateSettings(_prevState: ActionState, formData: FormData): Promise<ActionState> {

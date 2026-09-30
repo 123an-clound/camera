@@ -16,7 +16,7 @@ import { useCart, type CartItem } from "@/lib/cart";
 import { formatVND } from "@/lib/format";
 import { currentUnitPrice, groupForSubmit, lineDays, lineIssue, lineTotal, type ProductNow } from "@/lib/cart-logic";
 import { todayInShop } from "@/lib/rental";
-import { getCartProducts } from "./actions";
+import { getCartProducts, getResponseTime } from "./actions";
 
 const contactSchema = createOrderSchema.pick({
   customerName: true,
@@ -111,6 +111,10 @@ export default function CartPage() {
   const [refreshFailed, setRefreshFailed] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [sentOrders, setSentOrders] = useState<string[] | null>(null);
+  const [responseTime, setResponseTime] = useState("");
+  useEffect(() => {
+    getResponseTime().then(setResponseTime, () => undefined);
+  }, []);
 
   const {
     register,
@@ -204,7 +208,7 @@ export default function CartPage() {
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Đã gửi yêu cầu</h1>
         <p className="mt-3 text-muted-foreground">
-          Cửa hàng sẽ gọi lại để xác nhận lịch nhận máy và tiền cọc. Mã yêu cầu của bạn:
+          {responseTime || "Cửa hàng sẽ gọi lại để xác nhận lịch nhận máy và tiền cọc."} Mã yêu cầu của bạn:
         </p>
         <p className="mt-3 font-mono text-lg text-primary">
           {sentOrders.map((id) => id.slice(0, 8).toUpperCase()).join(" · ")}
@@ -277,6 +281,7 @@ export default function CartPage() {
         </p>
         <p className="text-xs text-muted-foreground">
           Đây là yêu cầu, chưa phải thanh toán. Cửa hàng sẽ liên hệ xác nhận, báo tiền cọc (nếu thuê) và lịch nhận máy.
+          {responseTime && <strong className="mt-1 block text-foreground">{responseTime}</strong>}
         </p>
 
         <div className="space-y-1">
@@ -320,6 +325,13 @@ export default function CartPage() {
           <Textarea id="note" maxLength={1000} {...register("note")} />
         </div>
 
+        <p className="text-xs text-muted-foreground">
+          Khi gửi, bạn đồng ý để cửa hàng dùng thông tin trên để liên hệ về yêu cầu này. Xem{" "}
+          <Link href="/privacy" className="underline hover:text-foreground">
+            Chính sách bảo mật
+          </Link>
+          .
+        </p>
         {submitError && (
           <p role="alert" className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
             {submitError}

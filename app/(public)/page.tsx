@@ -2,6 +2,7 @@ import { HeroStory, HomeBanners } from "@/components/public/hero";
 import { ProductCard } from "@/components/public/product-card";
 import { FadeIn } from "@/components/motion/fade-in";
 import { RentalSteps } from "@/components/public/rental-steps";
+import { StoreJsonLd } from "@/components/public/store-jsonld";
 import { getFeaturedProducts, listProducts } from "@/lib/products";
 import type { ProductWithImages } from "@/lib/types";
 import { getSiteConfig } from "@/lib/site-config";
@@ -81,5 +82,10 @@ export default async function Home() {
     steps: () => <RentalSteps key="steps" index={++n} kicker={home.steps_kicker} title={home.steps_title} steps={home.steps} />,
   };
 
-  return <div>{enabled.map((id) => render[id]())}</div>;
+  return (
+    <div>
+      <StoreJsonLd />
+      {enabled.map((id) => render[id]())}
+    </div>
+  );
 }

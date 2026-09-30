@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ProductCard } from "@/components/public/product-card";
 import { ProductFilters } from "@/components/public/product-filters";
+import { Breadcrumbs } from "@/components/public/breadcrumbs";
 import { getBrands, getCategories, listProducts, type ProductFilters as Filters } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -40,6 +41,7 @@ export default async function ProductsPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      <Breadcrumbs items={[{ label: "Sản phẩm" }]} />
       <h1 className="mb-6 text-2xl font-semibold tracking-tight">Sản phẩm</h1>
       <ProductFilters categories={categories} brands={brands} />
 

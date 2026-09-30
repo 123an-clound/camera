@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Static pages carry no lastmod: we don't track when their content changes, and a
   // lastmod of "now" on every request would be misleading.
-  const staticRoutes: MetadataRoute.Sitemap = ["", "/products", "/about", "/contact"].map((path) => ({
+  const staticRoutes: MetadataRoute.Sitemap = ["", "/products", "/about", "/contact", "/privacy"].map((path) => ({
     url: `${SITE_URL}${path}`,
   }));
 

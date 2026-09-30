@@ -44,9 +44,10 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: store,
       title,
       description,
-      images: seo.og_image ? [{ url: seo.og_image, width: 1200, height: 630 }] : undefined,
+      // Uploaded image, else the generated default (app/og/route.tsx).
+      images: [{ url: seo.og_image || "/og", width: 1200, height: 630 }],
     },
-    twitter: { card: seo.og_image ? "summary_large_image" : "summary", title, description },
+    twitter: { card: "summary_large_image", title, description, images: [seo.og_image || "/og"] },
   };
 }
 

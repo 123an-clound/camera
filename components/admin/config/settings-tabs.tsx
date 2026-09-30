@@ -229,6 +229,13 @@ function ContactTab({ initial }: { initial: SiteConfigGroups["contact"] }) {
               onChange={(opening_hours) => set({ ...v, opening_hours })}
             />
             <TextField
+              label="Cam kết thời gian phản hồi"
+              value={v.response_time}
+              placeholder="VD: Shop gọi lại trong vòng 30 phút (8:00–21:00)"
+              hint="Hiện ở giỏ hàng và trang Liên hệ. Để trống nếu chưa cam kết."
+              onChange={(response_time) => set({ ...v, response_time })}
+            />
+            <TextField
               label="Vị trí bản đồ"
               value={v.map_query}
               hint="Tên/địa chỉ để Google Maps tìm. Để trống sẽ dùng địa chỉ ở tab Chung."

@@ -37,6 +37,9 @@ export async function Footer() {
               {s.label}
             </a>
           ))}
+          <Link href="/privacy" className="hover:text-foreground">
+            Chính sách bảo mật
+          </Link>
           {footer.links.map((l) => (
             <Link key={`${l.label}${l.href}`} href={l.href} className="hover:text-foreground">
               {l.label}

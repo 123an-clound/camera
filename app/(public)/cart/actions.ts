@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteConfig } from "@/lib/site-config";
 
 export type CartProductState = {
   id: string;
@@ -14,6 +15,12 @@ export type CartProductState = {
 };
 
 const ids = z.array(z.string().uuid()).max(50);
+
+// Owner's stated reply time (Settings → Liên hệ & MXH), "" when not set.
+export async function getResponseTime(): Promise<string> {
+  const { contact } = await getSiteConfig();
+  return contact.response_time;
+}
 
 // Current price/availability for the products in a cart (the cart itself lives in
 // localStorage and can be days old). Only public, active-product fields are returned.

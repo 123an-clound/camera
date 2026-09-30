@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
 import { settingText } from "@/lib/site-settings";
 import { getSiteConfig } from "@/lib/site-config";
+import { Breadcrumbs } from "@/components/public/breadcrumbs";
 
-export const metadata: Metadata = { title: "Giới thiệu", alternates: { canonical: "/about" } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { settings } = await getSiteConfig();
+  const store = settingText(settings, "store_name", "Camera Rent");
+  return {
+    title: "Giới thiệu",
+    description: `Về ${store}: cửa hàng bán và cho thuê máy ảnh, ống kính chính hãng — cách chúng tôi kiểm tra máy và câu hỏi thường gặp.`,
+    alternates: { canonical: "/about" },
+  };
+}
 
 export default async function AboutPage() {
   const { settings, about } = await getSiteConfig();
@@ -24,6 +33,7 @@ export default async function AboutPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-14 px-4 py-12">
+      <Breadcrumbs items={[{ label: "Giới thiệu" }]} />
       <section>
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Giới thiệu {storeName}</h1>
         <p className="mt-4 whitespace-pre-line text-muted-foreground">{body}</p>

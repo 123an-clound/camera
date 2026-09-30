@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
 import { settingText } from "@/lib/site-settings";
 import { getSiteConfig } from "@/lib/site-config";
+import { Breadcrumbs } from "@/components/public/breadcrumbs";
+import { StoreJsonLd } from "@/components/public/store-jsonld";
 import { MapEmbed } from "@/components/public/map-embed";
 
-export const metadata: Metadata = { title: "Liên hệ", alternates: { canonical: "/contact" } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { settings } = await getSiteConfig();
+  const store = settingText(settings, "store_name", "Camera Rent");
+  const address = settingText(settings, "address", "");
+  return {
+    title: "Liên hệ",
+    description: `Liên hệ ${store}: điện thoại, email${address ? `, địa chỉ ${address}` : ""}, giờ mở cửa và bản đồ chỉ đường.`,
+    alternates: { canonical: "/contact" },
+  };
+}
 
 export default async function ContactPage() {
   const { settings, contact } = await getSiteConfig();
@@ -22,7 +33,10 @@ export default async function ContactPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-12">
+      <StoreJsonLd />
+      <Breadcrumbs items={[{ label: "Liên hệ" }]} />
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Liên hệ</h1>
+      {contact.response_time && <p className="text-muted-foreground">{contact.response_time}</p>}
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2 text-muted-foreground">
           {phone && (

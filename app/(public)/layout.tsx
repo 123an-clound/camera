@@ -5,6 +5,7 @@ import { PageTransition } from "@/components/motion/page-transition";
 import { CursorSpotlight } from "@/components/public/cursor-spotlight";
 import { AnnouncementBar } from "@/components/public/announcement-bar";
 import { FloatingContact } from "@/components/public/floating-contact";
+import { Analytics } from "@/components/public/analytics";
 import { getSiteConfig } from "@/lib/site-config";
 import { ACCENTS } from "@/lib/site-config-schema";
 import { settingText } from "@/lib/site-settings";
@@ -33,6 +34,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
       <Navbar />
       {theme.enable_transition ? <PageTransition>{main}</PageTransition> : main}
       <Footer />
+      <Analytics />
       {contact.floating_buttons && (
         <>
           {/* Room so the last content/footer can scroll clear of the floating buttons on phones. */}

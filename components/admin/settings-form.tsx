@@ -50,6 +50,16 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           <Label htmlFor="about">Giới thiệu</Label>
           <Textarea id="about" name="about" rows={5} defaultValue={text("about")} />
         </div>
+        <div className="space-y-1">
+          <Label htmlFor="privacy_policy">Chính sách bảo mật (trang /privacy)</Label>
+          <Textarea
+            id="privacy_policy"
+            name="privacy_policy"
+            rows={8}
+            defaultValue={text("privacy_policy")}
+            placeholder="Để trống: trang hiển thị mô tả dữ liệu website thực sự thu thập. Nên thay bằng chính sách đã được rà soát pháp lý."
+          />
+        </div>
       </div>
 
       <div className="space-y-4 rounded-xl border border-border/60 p-4">
