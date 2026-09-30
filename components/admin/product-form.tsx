@@ -78,6 +78,18 @@ export function ProductForm({ product, categories }: { product?: ProductWithImag
         <Textarea id="description" name="description" rows={6} defaultValue={product?.description ?? ""} />
       </div>
 
+      <div className="space-y-3 rounded-xl border border-border/60 p-4">
+        <p className="font-medium">SEO (tuỳ chọn)</p>
+        <div className="space-y-1">
+          <Label htmlFor="seo_title">Tiêu đề SEO (≤ 60 ký tự, trống = tên sản phẩm)</Label>
+          <Input id="seo_title" name="seo_title" maxLength={70} defaultValue={product?.seo_title ?? ""} />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="seo_description">Mô tả SEO (≤ 160 ký tự, trống = mô tả ngắn)</Label>
+          <Textarea id="seo_description" name="seo_description" rows={2} maxLength={170} defaultValue={product?.seo_description ?? ""} />
+        </div>
+      </div>
+
       <div className="space-y-2 rounded-xl border border-border/60 p-4">
         <div className="flex items-center gap-2">
           <Switch id="is_for_sale" name="is_for_sale" defaultChecked={product?.is_for_sale ?? true} />

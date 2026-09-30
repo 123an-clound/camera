@@ -14,12 +14,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!product) return {};
 
   const image = product.camera_product_images[0]?.url;
+  const title = product.seo_title || product.name;
+  const description = product.seo_description || product.short_desc || product.description || undefined;
   return {
-    title: product.name,
-    description: product.short_desc ?? product.description ?? undefined,
+    title,
+    description,
     openGraph: {
-      title: product.name,
-      description: product.short_desc ?? undefined,
+      title,
+      description,
       images: image ? [image] : undefined,
     },
   };

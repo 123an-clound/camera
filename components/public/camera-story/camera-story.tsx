@@ -15,38 +15,23 @@ import { ArrowRight } from "lucide-react";
 import { ViewfinderCorners } from "@/components/public/viewfinder";
 import { CameraBlueprint } from "./camera-blueprint";
 import { CHAPTERS, activeChapter } from "./explode";
+import type { SiteConfigGroups } from "@/lib/site-config-schema";
 
 const CameraScene = dynamic(() => import("./camera-scene"), {
   ssr: false,
   loading: () => <BlueprintBackdrop />,
 });
 
-const STORY = [
-  {
-    kicker: "Ống kính",
-    title: "Soi từng thấu kính",
-    body: "Mỗi ống kính được kiểm tra nấm mốc, bụi và hiệu chỉnh lấy nét trước và sau mỗi lượt thuê.",
-    spec: "XF18-55mm · 14 thấu kính · 7 lá khẩu",
-  },
-  {
-    kicker: "Màn trập",
-    title: "Shutter count minh bạch",
-    body: "Số lần chụp được ghi rõ trên từng máy, bạn biết chính xác thiết bị mình nhận.",
-    spec: "1/8000s cơ · 1/180000s điện tử",
-  },
-  {
-    kicker: "Cảm biến",
-    title: "Cảm biến sạch như mới",
-    body: "Vệ sinh cảm biến định kỳ, không một hạt bụi nào lọt vào khung hình của bạn.",
-    spec: "X-Trans CMOS 5 HR · 40.2MP · IBIS 7 stop",
-  },
-  {
-    kicker: "Phụ kiện",
-    title: "Đủ bộ, sẵn sàng bấm máy",
-    body: "Mỗi lượt thuê kèm 2 pin NP-W235 sạc đầy, sạc, thẻ nhớ 128GB và túi chống sốc.",
-    spec: "2× NP-W235 · 128GB · túi",
-  },
-] as const;
+// Copy is admin-editable (Settings -> Trang chủ / Story 3D); the four chapters map to the
+// four fixed 3D scenes.
+export type StoryContent = SiteConfigGroups["story"];
+export type HeroContent = {
+  title: string;
+  subtitle: string;
+  kicker: string;
+  primary: { label: string; href: string };
+  secondary: { label: string; href: string };
+};
 
 const TOTAL_FRAMES = 36;
 
@@ -114,24 +99,23 @@ function SecondaryCta({ href, children }: { href: string; children: React.ReactN
   );
 }
 
-function Intro({ title, subtitle }: { title: string; subtitle: string }) {
+function Intro({ hero }: { hero: HeroContent }) {
   return (
     <>
-      <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.3em] text-primary">
-        ● Optical Lab · Bán &amp; cho thuê
-      </p>
-      <h1 className="text-4xl font-bold leading-[1.05] tracking-tight text-balance md:text-6xl">{title}</h1>
-      <p className="mt-4 max-w-md text-base text-muted-foreground md:text-lg">{subtitle}</p>
+      {hero.kicker && <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.3em] text-primary">{hero.kicker}</p>}
+      <h1 className="text-4xl font-bold leading-[1.05] tracking-tight text-balance md:text-6xl">{hero.title}</h1>
+      <p className="mt-4 max-w-md text-base text-muted-foreground md:text-lg">{hero.subtitle}</p>
       <div className="mt-8 flex flex-wrap gap-3">
-        <PrimaryCta href="/products?mode=rent">Thuê máy ngay</PrimaryCta>
-        <SecondaryCta href="/products?mode=sale">Mua máy</SecondaryCta>
+        {hero.primary.label && hero.primary.href && <PrimaryCta href={hero.primary.href}>{hero.primary.label}</PrimaryCta>}
+        {hero.secondary.label && hero.secondary.href && (
+          <SecondaryCta href={hero.secondary.href}>{hero.secondary.label}</SecondaryCta>
+        )}
       </div>
     </>
   );
 }
 
-function ChapterCopy({ index }: { index: number }) {
-  const c = STORY[index];
+function ChapterCopy({ index, c }: { index: number; c: StoryContent["chapters"][number] }) {
   return (
     <>
       <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.3em] text-primary">
@@ -146,17 +130,17 @@ function ChapterCopy({ index }: { index: number }) {
   );
 }
 
-function Outro() {
+function Outro({ o }: { o: StoryContent["outro"] }) {
   return (
     <>
-      <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.3em] text-primary">05 / Sẵn sàng</p>
-      <h2 className="text-3xl font-bold tracking-tight md:text-5xl">Khung hình tiếp theo là của bạn</h2>
-      <p className="mt-4 max-w-md text-base text-muted-foreground md:text-lg">
-        Hàng chục thân máy và ống kính đã được kiểm tra, sẵn sàng giao trong ngày.
-      </p>
-      <div className="mt-8">
-        <PrimaryCta href="/products">Khám phá kho máy</PrimaryCta>
-      </div>
+      <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.3em] text-primary">05 / {o.kicker}</p>
+      <h2 className="text-3xl font-bold tracking-tight md:text-5xl">{o.title}</h2>
+      <p className="mt-4 max-w-md text-base text-muted-foreground md:text-lg">{o.body}</p>
+      {o.cta_label && o.cta_href && (
+        <div className="mt-8">
+          <PrimaryCta href={o.cta_href}>{o.cta_label}</PrimaryCta>
+        </div>
+      )}
     </>
   );
 }
@@ -177,7 +161,7 @@ function Slide({ active, children }: { active: boolean; children: React.ReactNod
   );
 }
 
-function PinnedStory({ title, subtitle }: { title: string; subtitle: string }) {
+function PinnedStory({ hero, story }: { hero: HeroContent; story: StoryContent }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.4 });
@@ -193,7 +177,7 @@ function PinnedStory({ title, subtitle }: { title: string; subtitle: string }) {
     <section ref={ref} aria-label="Bên trong một chiếc máy ảnh" className="relative -mt-16 h-[320vh] md:h-[450vh]">
       <div className="sticky top-0 h-svh overflow-hidden">
         <div aria-hidden className="bg-blueprint absolute inset-0 [mask-image:radial-gradient(ellipse_at_60%_45%,black_30%,transparent_75%)]" />
-        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_65%_50%,oklch(0.8_0.16_70/10%),transparent_55%)]" />
+        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_65%_50%,color-mix(in_oklch,var(--primary)_10%,transparent),transparent_55%)]" />
 
         <div className="absolute inset-0">
           {webgl ? <CameraScene progress={progress} active={inView} /> : <BlueprintBackdrop />}
@@ -208,7 +192,7 @@ function PinnedStory({ title, subtitle }: { title: string; subtitle: string }) {
           <span className="flex items-center gap-2">
             <span className="size-2 animate-pulse rounded-full bg-red-500" /> REC
           </span>
-          <span>FUJIFILM X-T5 · ISO 125 · 1/250 · ƒ/2.8</span>
+          <span>{story.hud}</span>
           <span>
             FRAME <motion.span className="text-primary">{frame}</motion.span>/{TOTAL_FRAMES}
           </span>
@@ -218,23 +202,23 @@ function PinnedStory({ title, subtitle }: { title: string; subtitle: string }) {
         <div className="relative mx-auto flex h-full max-w-6xl items-end px-4 pb-10 md:items-center md:pb-0">
           <div className="grid w-full max-w-lg rounded-2xl bg-background/60 p-5 backdrop-blur-sm md:bg-transparent md:p-0 md:backdrop-blur-none">
             <Slide active={chapter === -1}>
-              <Intro title={title} subtitle={subtitle} />
+              <Intro hero={hero} />
             </Slide>
-            {STORY.map((_, i) => (
+            {story.chapters.map((c, i) => (
               <Slide key={i} active={chapter === i}>
-                <ChapterCopy index={i} />
+                <ChapterCopy index={i} c={c} />
               </Slide>
             ))}
             <Slide active={chapter === CHAPTERS.length}>
-              <Outro />
+              <Outro o={story.outro} />
             </Slide>
           </div>
         </div>
 
         {/* Focus-ring style progress rail */}
         <div aria-hidden className="absolute right-8 top-1/2 hidden -translate-y-1/2 flex-col items-end gap-5 md:flex">
-          {STORY.map((c, i) => (
-            <div key={c.kicker} className="flex items-center gap-3">
+          {story.chapters.map((c, i) => (
+            <div key={i} className="flex items-center gap-3">
               <span
                 className={`font-mono text-[10px] uppercase tracking-widest transition-colors ${
                   chapter === i ? "text-primary" : "text-muted-foreground/60"
@@ -264,20 +248,20 @@ function PinnedStory({ title, subtitle }: { title: string; subtitle: string }) {
   );
 }
 
-// Reduced motion: no pinning, no canvas — the same story as a static list.
-function StaticStory({ title, subtitle }: { title: string; subtitle: string }) {
+// Reduced motion (or 3D disabled in admin): no pinning, no canvas — the same story as a list.
+function StaticStory({ hero, story }: { hero: HeroContent; story: StoryContent }) {
   return (
     <section aria-label="Bên trong một chiếc máy ảnh" className="bg-blueprint">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-2">
         <div>
-          <Intro title={title} subtitle={subtitle} />
+          <Intro hero={hero} />
         </div>
         <CameraBlueprint className="w-full max-w-lg" />
       </div>
       <div className="mx-auto grid max-w-6xl gap-8 px-4 pb-20 md:grid-cols-2">
-        {STORY.map((_, i) => (
+        {story.chapters.map((c, i) => (
           <div key={i} className="rounded-2xl border border-border bg-card/60 p-6">
-            <ChapterCopy index={i} />
+            <ChapterCopy index={i} c={c} />
           </div>
         ))}
       </div>
@@ -285,11 +269,7 @@ function StaticStory({ title, subtitle }: { title: string; subtitle: string }) {
   );
 }
 
-export function CameraStory({ title, subtitle }: { title: string; subtitle: string }) {
+export function CameraStory({ hero, story, enable3d }: { hero: HeroContent; story: StoryContent; enable3d: boolean }) {
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-  return reducedMotion ? (
-    <StaticStory title={title} subtitle={subtitle} />
-  ) : (
-    <PinnedStory title={title} subtitle={subtitle} />
-  );
+  return reducedMotion || !enable3d ? <StaticStory hero={hero} story={story} /> : <PinnedStory hero={hero} story={story} />;
 }

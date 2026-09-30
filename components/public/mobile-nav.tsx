@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { NAV_LINKS } from "@/lib/nav-links";
+import type { NavLink } from "@/lib/nav-links";
 import { useIsNavActive } from "@/lib/use-nav-active";
 
 function MobileNavLink({ href, label, onNavigate }: { href: string; label: string; onNavigate: () => void }) {
@@ -24,7 +24,7 @@ function MobileNavLink({ href, label, onNavigate }: { href: string; label: strin
   );
 }
 
-export function MobileNav() {
+export function MobileNav({ links }: { links: NavLink[] }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -40,7 +40,7 @@ export function MobileNav() {
 
       {open && (
         <nav className="absolute inset-x-0 top-16 z-40 flex flex-col gap-1 border-b border-border/60 bg-background/95 p-4 shadow-sm backdrop-blur-xl">
-          {NAV_LINKS.map((link) => (
+          {links.map((link) => (
             <MobileNavLink key={link.href} href={link.href} label={link.label} onNavigate={() => setOpen(false)} />
           ))}
         </nav>

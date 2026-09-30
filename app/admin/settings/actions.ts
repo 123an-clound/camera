@@ -18,6 +18,8 @@ export async function updateSettings(_prevState: ActionState, formData: FormData
 
   for (const key of TEXT_KEYS) {
     const value = String(formData.get(key) ?? "").trim();
+    if (key === "facebook_url" && value && !/^https:\/\//i.test(value)) return { error: "Link Facebook phải bắt đầu bằng https://" };
+    if (key === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return { error: "Email không hợp lệ" };
     rows.push({ key, value, updated_at: now });
   }
 

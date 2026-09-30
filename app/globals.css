@@ -179,7 +179,7 @@
 .spotlight {
   background: radial-gradient(
     640px circle at var(--mx, 50%) var(--my, -30%),
-    oklch(0.8 0.16 70 / 7%),
+    color-mix(in oklch, var(--primary) 7%, transparent),
     transparent 60%
   );
 }

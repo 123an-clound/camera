@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { AdminSidebar } from "@/components/admin/sidebar";
+
+// Admin must never be indexed by search engines.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();

@@ -1,9 +1,11 @@
-import { Hero } from "@/components/public/hero";
+import { HeroStory, HomeBanners } from "@/components/public/hero";
 import { ProductCard } from "@/components/public/product-card";
 import { FadeIn } from "@/components/motion/fade-in";
 import { RentalSteps } from "@/components/public/rental-steps";
 import { getFeaturedProducts, listProducts } from "@/lib/products";
 import type { ProductWithImages } from "@/lib/types";
+import { getSiteConfig } from "@/lib/site-config";
+import type { HomeSectionId } from "@/lib/site-config-schema";
 
 function ProductSection({
   index,
@@ -48,37 +50,33 @@ function ProductSection({
 }
 
 export default async function Home() {
+  const { home } = await getSiteConfig();
+  const enabled = home.sections.filter((sec) => sec.enabled).map((sec) => sec.id);
+  const has = (id: HomeSectionId) => enabled.includes(id);
+
+  // Only query the product lists that are actually shown.
   const [featured, forSale, forRent] = await Promise.all([
-    getFeaturedProducts(8),
-    listProducts({ mode: "sale", sort: "newest" }).then((p) => p.slice(0, 4)),
-    listProducts({ mode: "rent", sort: "newest" }).then((p) => p.slice(0, 4)),
+    has("featured") ? getFeaturedProducts(8) : [],
+    has("sale") ? listProducts({ mode: "sale", sort: "newest" }).then((p) => p.slice(0, 4)) : [],
+    has("rent") ? listProducts({ mode: "rent", sort: "newest" }).then((p) => p.slice(0, 4)) : [],
   ]);
 
-  return (
-    <div>
-      <Hero />
-      <ProductSection
-        index={1}
-        title="Sản phẩm nổi bật"
-        href="/products"
-        products={featured}
-        emptyText="Chưa có sản phẩm nổi bật."
-      />
-      <ProductSection
-        index={2}
-        title="Máy ảnh bán"
-        href="/products?mode=sale"
-        products={forSale}
-        emptyText="Chưa có sản phẩm đang bán."
-      />
-      <ProductSection
-        index={3}
-        title="Máy ảnh cho thuê"
-        href="/products?mode=rent"
-        products={forRent}
-        emptyText="Chưa có sản phẩm cho thuê."
-      />
-      <RentalSteps />
-    </div>
-  );
+  // Running "01 / 02 / …" numbers across the visible content sections.
+  let n = 0;
+  const render: Record<HomeSectionId, () => React.ReactNode> = {
+    story: () => <HeroStory key="story" />,
+    banners: () => <HomeBanners key="banners" />,
+    featured: () => (
+      <ProductSection key="featured" index={++n} title={home.featured_title} href="/products" products={featured} emptyText="Chưa có sản phẩm nổi bật." />
+    ),
+    sale: () => (
+      <ProductSection key="sale" index={++n} title={home.sale_title} href="/products?mode=sale" products={forSale} emptyText="Chưa có sản phẩm đang bán." />
+    ),
+    rent: () => (
+      <ProductSection key="rent" index={++n} title={home.rent_title} href="/products?mode=rent" products={forRent} emptyText="Chưa có sản phẩm cho thuê." />
+    ),
+    steps: () => <RentalSteps key="steps" index={++n} kicker={home.steps_kicker} title={home.steps_title} steps={home.steps} />,
+  };
+
+  return <div>{enabled.map((id) => render[id]())}</div>;
 }

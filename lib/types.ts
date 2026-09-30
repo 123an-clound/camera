@@ -28,6 +28,8 @@ export type Product = {
   is_featured: boolean;
   is_active: boolean;
   sort_order: number;
+  seo_title: string | null;
+  seo_description: string | null;
   created_at: string;
   updated_at: string;
 };

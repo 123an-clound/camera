@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getSiteSettings, settingText } from "@/lib/site-settings";
+import { settingText } from "@/lib/site-settings";
+import { getSiteConfig } from "@/lib/site-config";
 import { CartBadge } from "@/components/public/cart-badge";
 import { MobileNav } from "@/components/public/mobile-nav";
 import { NavLinks } from "@/components/public/nav-links";
 
 export async function Navbar() {
-  const settings = await getSiteSettings();
+  const { settings, nav } = await getSiteConfig();
   const storeName = settingText(settings, "store_name", "Camera Rent");
   const logoUrl = settingText(settings, "logo_url", "");
 
@@ -27,10 +28,10 @@ export async function Navbar() {
             REC
           </span>
         </Link>
-        <NavLinks />
+        <NavLinks links={nav.links} />
         <div className="flex items-center gap-1">
           <CartBadge />
-          <MobileNav />
+          <MobileNav links={nav.links} />
         </div>
       </div>
     </header>

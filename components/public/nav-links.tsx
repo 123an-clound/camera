@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { NAV_LINKS } from "@/lib/nav-links";
+import type { NavLink as NavLinkItem } from "@/lib/nav-links";
 import { useIsNavActive } from "@/lib/use-nav-active";
 
 function NavLink({ href, label }: { href: string; label: string }) {
@@ -28,10 +28,10 @@ function NavLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-export function NavLinks() {
+export function NavLinks({ links }: { links: NavLinkItem[] }) {
   return (
     <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
-      {NAV_LINKS.map((link) => (
+      {links.map((link) => (
         <NavLink key={link.href} href={link.href} label={link.label} />
       ))}
     </nav>
