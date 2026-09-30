@@ -23,5 +23,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Sai email hoặc mật khẩu" }, { status: 401 });
   }
 
+  // Signed in, but the project is shared: only camera_admins may enter the shop admin.
+  const { data: isAdmin } = await supabase.rpc("camera_is_admin");
+  if (isAdmin !== true) {
+    await supabase.auth.signOut();
+    return NextResponse.json({ error: "Tài khoản không có quyền quản trị" }, { status: 403 });
+  }
+
   return NextResponse.json({ ok: true });
 }

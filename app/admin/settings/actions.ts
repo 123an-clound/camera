@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getAdminClient } from "@/lib/admin-auth";
 import { uploadToBucket } from "@/lib/storage";
 import type { ActionState } from "@/app/admin/products/actions";
 
@@ -9,7 +9,9 @@ const TEXT_KEYS = ["store_name", "hero_title", "hero_subtitle", "phone", "addres
 const IMAGE_KEYS = ["hero_image", "logo_url"];
 
 export async function updateSettings(_prevState: ActionState, formData: FormData): Promise<ActionState> {
-  const supabase = await createClient();
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
 
   const rows: { key: string; value: string; updated_at: string }[] = [];
   const now = new Date().toISOString();

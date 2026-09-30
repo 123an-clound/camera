@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getAdminClient } from "@/lib/admin-auth";
 import { uploadToBucket } from "@/lib/storage";
 import { slugify } from "@/lib/slug";
 
@@ -69,7 +70,7 @@ function specsToObject(raw: string | undefined): Record<string, string> {
   }
 }
 
-async function uploadImages(supabase: Awaited<ReturnType<typeof createClient>>, productId: string, formData: FormData, startOrder: number) {
+async function uploadImages(supabase: SupabaseClient, productId: string, formData: FormData, startOrder: number) {
   const files = formData.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
   let order = startOrder;
   for (const file of files) {
@@ -89,7 +90,9 @@ export async function createProduct(_prevState: ActionState, formData: FormData)
   const parsed = parseForm(formData);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 
-  const supabase = await createClient();
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
   const d = parsed.data;
 
   const model3dFile = formData.get("model3d") as File | null;
@@ -143,7 +146,9 @@ export async function updateProduct(_prevState: ActionState, formData: FormData)
   const parsed = parseForm(formData);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 
-  const supabase = await createClient();
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
   const d = parsed.data;
 
   const update: Record<string, unknown> = {
@@ -192,8 +197,10 @@ export async function updateProduct(_prevState: ActionState, formData: FormData)
   return { ok: true };
 }
 
-export async function deleteProduct(id: string) {
-  const supabase = await createClient();
+export async function deleteProduct(id: string): Promise<ActionState> {
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
   const { error } = await supabase.from("camera_products").delete().eq("id", id);
   if (error) return { error: error.message };
 
@@ -203,8 +210,10 @@ export async function deleteProduct(id: string) {
   return { ok: true };
 }
 
-export async function deleteProductImage(imageId: string) {
-  const supabase = await createClient();
+export async function deleteProductImage(imageId: string): Promise<ActionState> {
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
   const { data: image } = await supabase.from("camera_product_images").select("product_id").eq("id", imageId).single();
   const { error } = await supabase.from("camera_product_images").delete().eq("id", imageId);
   if (error) return { error: error.message };
@@ -214,8 +223,10 @@ export async function deleteProductImage(imageId: string) {
   return { ok: true };
 }
 
-export async function setPrimaryImage(productId: string, imageId: string) {
-  const supabase = await createClient();
+export async function setPrimaryImage(productId: string, imageId: string): Promise<ActionState> {
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
   await supabase.from("camera_product_images").update({ is_primary: false }).eq("product_id", productId);
   const { error } = await supabase.from("camera_product_images").update({ is_primary: true }).eq("id", imageId);
   if (error) return { error: error.message };

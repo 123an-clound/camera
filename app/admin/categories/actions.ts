@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { getAdminClient } from "@/lib/admin-auth";
+import type { ActionState } from "@/app/admin/products/actions";
 import { slugify } from "@/lib/slug";
 
 const categorySchema = z.object({
@@ -23,11 +24,13 @@ function parseForm(formData: FormData) {
   });
 }
 
-export async function createCategory(formData: FormData) {
+export async function createCategory(formData: FormData): Promise<ActionState> {
   const parsed = parseForm(formData);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 
-  const supabase = await createClient();
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
   const { error } = await supabase.from("camera_categories").insert({
     name: parsed.data.name,
     slug: parsed.data.slug,
@@ -41,11 +44,13 @@ export async function createCategory(formData: FormData) {
   return { ok: true };
 }
 
-export async function updateCategory(id: string, formData: FormData) {
+export async function updateCategory(id: string, formData: FormData): Promise<ActionState> {
   const parsed = parseForm(formData);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 
-  const supabase = await createClient();
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
   const { error } = await supabase
     .from("camera_categories")
     .update({
@@ -62,8 +67,10 @@ export async function updateCategory(id: string, formData: FormData) {
   return { ok: true };
 }
 
-export async function deleteCategory(id: string) {
-  const supabase = await createClient();
+export async function deleteCategory(id: string): Promise<ActionState> {
+  const auth = await getAdminClient();
+  if ("error" in auth) return auth;
+  const { supabase } = auth;
   const { error } = await supabase.from("camera_categories").delete().eq("id", id);
   if (error) return { error: "Không xóa được (có thể còn sản phẩm thuộc danh mục này)." };
 
