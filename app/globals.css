@@ -10,6 +10,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+  --font-display: var(--font-chakra);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -127,4 +128,58 @@
   html {
     @apply font-sans;
   }
+}
+/* ---------- Optical Lab public theme (scoped; admin keeps :root tokens) ---------- */
+.theme-lab {
+  --background: oklch(0.14 0.006 60);
+  --foreground: oklch(0.96 0.01 80);
+  --card: oklch(0.18 0.008 60);
+  --card-foreground: oklch(0.96 0.01 80);
+  --popover: oklch(0.18 0.008 60);
+  --popover-foreground: oklch(0.96 0.01 80);
+  --primary: oklch(0.8 0.16 70);
+  --primary-foreground: oklch(0.18 0.02 60);
+  --secondary: oklch(0.24 0.01 60);
+  --secondary-foreground: oklch(0.96 0.01 80);
+  --muted: oklch(0.22 0.008 60);
+  --muted-foreground: oklch(0.74 0.015 70);
+  --accent: oklch(0.26 0.02 65);
+  --accent-foreground: oklch(0.96 0.01 80);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.8 0.16 70);
+  --glow: oklch(0.8 0.16 70 / 35%);
+  color-scheme: dark;
+}
+
+.theme-lab :is(h1, h2, h3) {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.theme-lab ::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Faint blueprint grid used as page/section backdrop. */
+.bg-blueprint {
+  background-image:
+    linear-gradient(to right, oklch(1 0 0 / 4%) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(1 0 0 / 4%) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.text-glow {
+  text-shadow: 0 0 28px var(--glow);
+}
+
+/* Pointer-following light; --mx/--my are set on .theme-lab by CursorSpotlight. */
+.spotlight {
+  background: radial-gradient(
+    640px circle at var(--mx, 50%) var(--my, -30%),
+    oklch(0.8 0.16 70 / 7%),
+    transparent 60%
+  );
 }
