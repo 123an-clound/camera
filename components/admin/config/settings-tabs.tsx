@@ -11,7 +11,6 @@ import { Card, ConfigForm, ListEditor, TextField, Toggle } from "./kit";
 const TABS = [
   ["general", "Chung"],
   ["home", "Trang chủ"],
-  ["story", "Story 3D"],
   ["theme", "Giao diện"],
   ["menu", "Menu & Footer"],
   ["contact", "Liên hệ & MXH"],
@@ -73,47 +72,6 @@ function HomeTab({ initial }: { initial: SiteConfigGroups["home"] }) {
   );
 }
 
-function StoryTab({ initial }: { initial: SiteConfigGroups["story"] }) {
-  return (
-    <ConfigForm group="story" initial={initial}>
-      {(v, set) => (
-        <>
-          <Card title="Dòng thông số HUD" hint="Dòng chữ nhỏ trên cùng khung ngắm.">
-            <TextField label="HUD" value={v.hud} onChange={(hud) => set({ ...v, hud })} />
-          </Card>
-          <Card title="4 chương tách linh kiện" hint="Thứ tự cố định theo cảnh 3D: Ống kính → Màn trập → Cảm biến → Phụ kiện.">
-            {v.chapters.map((c, i) => {
-              const update = (next: typeof c) => set({ ...v, chapters: v.chapters.map((x, k) => (k === i ? next : x)) });
-              return (
-                <div key={i} className="space-y-3 rounded-lg border border-border/60 bg-muted/20 p-3">
-                  <p className="text-xs font-medium text-muted-foreground">Chương {i + 1}</p>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <TextField label="Nhãn" value={c.kicker} onChange={(kicker) => update({ ...c, kicker })} />
-                    <TextField label="Tiêu đề" value={c.title} onChange={(title) => update({ ...c, title })} />
-                  </div>
-                  <TextField label="Mô tả" value={c.body} multiline onChange={(body) => update({ ...c, body })} />
-                  <TextField label="Dòng thông số" value={c.spec} onChange={(spec) => update({ ...c, spec })} />
-                </div>
-              );
-            })}
-          </Card>
-          <Card title="Kết thúc (outro)">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <TextField label="Nhãn" value={v.outro.kicker} onChange={(kicker) => set({ ...v, outro: { ...v.outro, kicker } })} />
-              <TextField label="Tiêu đề" value={v.outro.title} onChange={(title) => set({ ...v, outro: { ...v.outro, title } })} />
-            </div>
-            <TextField label="Mô tả" value={v.outro.body} multiline onChange={(body) => set({ ...v, outro: { ...v.outro, body } })} />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <TextField label="Nút — chữ" value={v.outro.cta_label} onChange={(cta_label) => set({ ...v, outro: { ...v.outro, cta_label } })} />
-              <TextField label="Nút — link" value={v.outro.cta_href} hint={LINK_HINT} onChange={(cta_href) => set({ ...v, outro: { ...v.outro, cta_href } })} />
-            </div>
-          </Card>
-        </>
-      )}
-    </ConfigForm>
-  );
-}
-
 function ThemeTab({ initial }: { initial: SiteConfigGroups["theme"] }) {
   return (
     <ConfigForm group="theme" initial={initial}>
@@ -139,12 +97,6 @@ function ThemeTab({ initial }: { initial: SiteConfigGroups["theme"] }) {
             </div>
           </Card>
           <Card title="Hiệu ứng">
-            <Toggle
-              label="Máy ảnh 3D tách linh kiện"
-              hint="Tắt để trang chủ hiện bản tĩnh nhẹ hơn (hình vẽ blueprint)."
-              checked={v.enable_3d}
-              onChange={(enable_3d) => set({ ...v, enable_3d })}
-            />
             <Toggle label="Ánh sáng theo con trỏ chuột" checked={v.enable_spotlight} onChange={(enable_spotlight) => set({ ...v, enable_spotlight })} />
             <Toggle label="Hiệu ứng chuyển trang" checked={v.enable_transition} onChange={(enable_transition) => set({ ...v, enable_transition })} />
           </Card>
@@ -339,9 +291,6 @@ export function SettingsTabs({ settings, config }: { settings: SiteSettings; con
       </TabsContent>
       <TabsContent value="home" className="pt-4">
         <HomeTab initial={config.home} />
-      </TabsContent>
-      <TabsContent value="story" className="pt-4">
-        <StoryTab initial={config.story} />
       </TabsContent>
       <TabsContent value="theme" className="pt-4">
         <ThemeTab initial={config.theme} />

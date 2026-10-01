@@ -17,19 +17,22 @@ export async function GET() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "#0f0d0b",
-          color: "#f6f1ea",
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
+          background: "#fff7f0",
+          color: "#3b2a2f",
+          backgroundImage: "radial-gradient(rgba(204,47,99,0.14) 2px, transparent 2.5px)",
+          backgroundSize: "36px 36px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 16, color: "#f5a524", fontSize: 28, letterSpacing: 6 }}>
-          <div style={{ width: 18, height: 18, borderRadius: 9, background: "#f5a524" }} />
-          OPTICAL LAB
+        <div style={{ display: "flex", alignItems: "center", gap: 16, color: "#cc2f63", fontSize: 30, letterSpacing: 4 }}>
+          <div style={{ width: 22, height: 22, borderRadius: 11, background: "#ffd6e3", border: "3px solid #cc2f63" }} />
+          CAMERA RENTAL
         </div>
-        <div style={{ fontSize: 96, fontWeight: 700, marginTop: 24, lineHeight: 1.05 }}>{store}</div>
-        <div style={{ fontSize: 32, marginTop: 24, color: "#b8b2aa", letterSpacing: 4 }}>ISO 125 · 1/250 · f/2.8</div>
+        <div style={{ fontSize: 100, fontWeight: 700, marginTop: 24, lineHeight: 1.05 }}>{store}</div>
+        <div style={{ display: "flex", gap: 16, marginTop: 36 }}>
+          {["#ffd6e3", "#e4d9ff", "#fff0b3", "#d3f2e6", "#ffdccb"].map((c) => (
+            <div key={c} style={{ width: 64, height: 64, borderRadius: 16, background: c, border: "3px solid #3b2a2f" }} />
+          ))}
+        </div>
       </div>
     ),
     { width: 1200, height: 630 }

@@ -18,13 +18,12 @@ export default async function PublicLayout({ children }: { children: ReactNode }
     "--primary": accent.primary,
     "--primary-foreground": accent.foreground,
     "--ring": accent.primary,
-    "--glow": `color-mix(in oklch, ${accent.primary} 35%, transparent)`,
   } as CSSProperties;
   const main = <main className="flex-1">{children}</main>;
 
   return (
     <div
-      className="dark theme-lab relative flex min-h-full flex-1 flex-col bg-background text-foreground"
+      className="theme-lab relative flex min-h-full flex-1 flex-col bg-background text-foreground"
       style={accentVars}
     >
       {theme.enable_spotlight && <CursorSpotlight />}
@@ -38,7 +37,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
       {contact.floating_buttons && (
         <>
           {/* Room so the last content/footer can scroll clear of the floating buttons on phones. */}
-          <div aria-hidden className="h-24 bg-card/40 md:hidden" />
+          <div aria-hidden className="h-24 bg-secondary md:hidden" />
           <FloatingContact phone={settingText(settings, "phone", "")} zalo={contact.zalo} />
         </>
       )}

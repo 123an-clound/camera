@@ -12,21 +12,11 @@ export async function Navbar() {
   const logoUrl = settingText(settings, "logo_url", "");
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/60 backdrop-blur-xl">
-      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+    <header className="sticky top-0 z-50 px-3 pt-3">
+      <div className="relative mx-auto flex h-14 max-w-6xl items-center justify-between rounded-full border border-border bg-card/85 pl-3 pr-2 shadow-[0_8px_24px_-16px_rgb(59_42_47/0.35)] backdrop-blur-xl md:pl-4">
         <Link href="/" className="flex items-center gap-2.5 font-display text-lg font-bold tracking-tight">
-          {logoUrl ? (
-            <Image src={logoUrl} alt={storeName} width={32} height={32} className="rounded object-contain" />
-          ) : (
-            <span aria-hidden className="relative flex size-7 items-center justify-center rounded-full border border-primary/60">
-              <span className="size-2.5 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]" />
-            </span>
-          )}
+          <Image src={logoUrl || "/icon.png"} alt="" width={32} height={32} className="rounded-full object-contain" />
           {storeName}
-          <span aria-hidden className="hidden items-center gap-1 font-mono text-[9px] font-normal tracking-[0.25em] text-red-400 sm:flex">
-            <span className="size-1.5 animate-pulse rounded-full bg-red-500" />
-            REC
-          </span>
         </Link>
         <NavLinks links={nav.links} />
         <div className="flex items-center gap-1">

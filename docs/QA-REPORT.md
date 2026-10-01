@@ -120,3 +120,28 @@ Kết quả: ✅ 13/20 · ⚠️ 3 · ❌ 4 (đều cần nội dung/ID từ sho
 5. Supabase Dashboard: bật **Leaked password protection**; cân nhắc tắt **Allow new users to sign up** nếu app nhà hàng không cần.
 6. **Push branch** `feat/optical-lab-redesign` (lệnh push bị chặn bởi quyền của trợ lý — cần chủ dự án tự push) → Vercel tạo preview → chạy lại Lighthouse/Rich Results trên URL preview → merge → promote.
 7. Nội dung/ID cho checklist pre-launch: FAQ, case study, đánh giá thật, ảnh đội ngũ, thời gian phản hồi, GA4 ID, chính sách bảo mật đã rà soát, giờ mở cửa + toạ độ.
+
+## Cập nhật 2026-10-01 — giao diện "Soft Film Y2K"
+
+Đổi giao diện public sang phong cách sáng, pastel cho khách nữ Gen Z (admin giữ nguyên).
+
+- Nền kem `#FFF7F0`, chữ nâu cacao `#3B2A2F`; 5 màu nhấn trong admin (Hồng dâu mặc định, Tím lilac, Cam đào, Xanh mint, Vàng mật ong) — tất cả đạt tương phản AA với chữ trắng và với nền kem.
+- Font tiêu đề Baloo 2, chữ viết tay Dancing Script (đều có tiếng Việt); grain film, chấm bi, sticker SVG, băng dính washi, dấu ngày kiểu máy digicam.
+- Hero mới: collage polaroid từ ảnh sản phẩm thật (không bịa nội dung). Card sản phẩm kiểu polaroid. Navbar dạng viên thuốc, footer hồng.
+- Bỏ hẳn story 3D (component, tab admin "Story 3D", công tắc 3D, self-check timeline). Viewer 3D trên trang chi tiết sản phẩm giữ nguyên.
+- Sửa banner trang chủ bị trống: `AnimatePresence` kẹt ở pha exit (opacity 0) → thay bằng crossfade CSS.
+
+Kiểm chứng: `typecheck` ✅ · `lint` ✅ · `npm test` ✅ (3 bộ) · `build` ✅ · Playwright 390px/1440px (home, products, chi tiết, cart, 404 — không tràn ngang, không lỗi console).
+
+Lighthouse mobile (lab, median 3 lượt, `next start`):
+
+| Trang | Perf trước → sau | TBT trước → sau | A11y |
+|---|---|---|---|
+| `/` | 41 → 80 | 3.481 → 110 ms | 100 |
+| `/products` | 80 → 79 | 69 → 88 ms | 100 |
+| chi tiết SP | 83 → 82 | 31 → 74 ms | 100 |
+| `/cart` | 78 → 82 | 157 → 151 ms | 100 |
+| `/about` | 89 → 87 | 45 → 109 ms | 100 |
+| `/contact` | 88 → 88 | 39 → 56 ms | 100 |
+
+Rủi ro mục "Trang chủ trên điện thoại yếu" ở trên đã hết hiệu lực (không còn 3D trên trang chủ).

@@ -17,11 +17,10 @@ export async function Footer() {
   ].filter((s) => s.href);
 
   return (
-    <footer className="relative border-t border-border/60 bg-card/40">
-      <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+    <footer className="relative mt-8 rounded-t-[2.5rem] bg-secondary">
       {footer.tagline && (
         <div className="mx-auto max-w-6xl px-4 pt-12">
-          <p className="max-w-xl font-display text-2xl font-bold tracking-tight text-foreground md:text-3xl">{footer.tagline}</p>
+          <p className="max-w-xl font-display text-2xl font-bold text-foreground md:text-3xl">{footer.tagline} <span aria-hidden className="text-primary">♡</span></p>
         </div>
       )}
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
@@ -47,8 +46,8 @@ export async function Footer() {
           ))}
         </div>
       </div>
-      <div className="border-t border-border/60">
-        <p className="mx-auto max-w-6xl px-4 py-4 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+      <div className="border-t border-foreground/10">
+        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted-foreground">
           © {new Date().getFullYear()} {storeName}
           {footer.exif && ` · ${footer.exif}`}
         </p>

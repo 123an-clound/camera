@@ -22,7 +22,7 @@ npm run dev                  # http://localhost:3000
 | `npm run build` / `npm start` | Build và chạy bản production local |
 | `npm run lint` | ESLint (gồm quy tắc React Compiler) |
 | `npm run typecheck` | TypeScript |
-| `npm test` | Kiểm thử hồi quy: quy tắc thuê, giỏ hàng, cấu hình site, timeline 3D |
+| `npm test` | Kiểm thử hồi quy: quy tắc thuê, giỏ hàng, cấu hình site |
 
 ## Biến môi trường
 
@@ -62,7 +62,7 @@ Vercel tự cấp `VERCEL_ENV` / `VERCEL_PROJECT_PRODUCTION_URL`: bản preview 
 - **Sản phẩm:** thêm/sửa/xoá, ảnh, model 3D (.glb), SEO riêng; ngay trên danh sách có bật/tắt hiển thị, nổi bật, thứ tự, nhân bản, tìm/lọc.
 - **Yêu cầu:** lọc theo trạng thái, tìm tên/SĐT/email, chi tiết từng yêu cầu, ghi chú nội bộ, đổi trạng thái, xuất CSV (Excel).
 - **Danh mục, Banner.**
-- **Cài đặt** (8 tab): thông tin chung, trang chủ (bố cục, nút), story 3D, giao diện (màu nhấn, bật/tắt 3D/hiệu ứng, thanh thông báo), menu & footer, liên hệ & MXH, SEO, giới thiệu & FAQ. Lưu xong site cập nhật ngay.
+- **Cài đặt** (7 tab): thông tin chung, trang chủ (bố cục, nút), giao diện (5 màu nhấn pastel, bật/tắt hiệu ứng, thanh thông báo), menu & footer, liên hệ & MXH, SEO, giới thiệu & FAQ. Lưu xong site cập nhật ngay.
 
 ## Quy tắc nghiệp vụ đang áp dụng
 
@@ -78,7 +78,7 @@ Vercel tự cấp `VERCEL_ENV` / `VERCEL_PROJECT_PRODUCTION_URL`: bản preview 
 | Sitemap chứa `localhost` | Chưa đặt `NEXT_PUBLIC_SITE_URL` và không chạy trên Vercel |
 | Đăng nhập admin báo "không có quyền" | Tài khoản chưa có trong `camera_admins` |
 | Khách báo "Ngày nhận máy đã qua" | Giỏ cũ; chọn lại ngày trên trang sản phẩm |
-| Trang chủ chậm trên máy yếu | Admin → Cài đặt → Giao diện → tắt "Máy ảnh 3D" |
+| Collage trang chủ thiếu ảnh | Collage lấy ảnh chính của sản phẩm nổi bật (rồi sản phẩm mới nhất) — thêm ảnh cho sản phẩm hoặc đánh dấu "Nổi bật" |
 | Bị giới hạn "gửi quá nhanh" | Rate limit 10 yêu cầu/10 phút/IP (in-memory, mỗi instance) |
 
 ## Cần khách hàng cung cấp/xác nhận trước production

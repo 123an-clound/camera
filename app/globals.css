@@ -10,7 +10,8 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
-  --font-display: var(--font-chakra);
+  --font-display: var(--font-baloo);
+  --font-script: var(--font-dancing);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -129,57 +130,117 @@
     @apply font-sans;
   }
 }
-/* ---------- Optical Lab public theme (scoped; admin keeps :root tokens) ---------- */
+/* ---------- Soft Film public theme (scoped; admin keeps :root tokens) ---------- */
+/* Light cream "film photo" look for the public site. --primary/--primary-foreground/--ring
+   are overridden per accent preset from admin (app/(public)/layout.tsx). Text colours keep
+   WCAG AA (≥4.5:1) on the cream background. */
 .theme-lab {
-  --background: oklch(0.14 0.006 60);
-  --foreground: oklch(0.96 0.01 80);
-  --card: oklch(0.18 0.008 60);
-  --card-foreground: oklch(0.96 0.01 80);
-  --popover: oklch(0.18 0.008 60);
-  --popover-foreground: oklch(0.96 0.01 80);
-  --primary: oklch(0.8 0.16 70);
-  --primary-foreground: oklch(0.18 0.02 60);
-  --secondary: oklch(0.24 0.01 60);
-  --secondary-foreground: oklch(0.96 0.01 80);
-  --muted: oklch(0.22 0.008 60);
-  --muted-foreground: oklch(0.74 0.015 70);
-  --accent: oklch(0.26 0.02 65);
-  --accent-foreground: oklch(0.96 0.01 80);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.8 0.16 70);
-  --glow: oklch(0.8 0.16 70 / 35%);
-  color-scheme: dark;
+  --background: #fff7f0;
+  --foreground: #3b2a2f;
+  --card: #ffffff;
+  --card-foreground: #3b2a2f;
+  --popover: #ffffff;
+  --popover-foreground: #3b2a2f;
+  --primary: #cc2f63;
+  --primary-foreground: #ffffff;
+  --secondary: #ffe3ec;
+  --secondary-foreground: #3b2a2f;
+  --muted: #f7ede6;
+  --muted-foreground: #7a6268;
+  --accent: #efe6ff;
+  --accent-foreground: #3b2a2f;
+  --destructive: #c62828;
+  --border: #eadbd2;
+  --input: #eadbd2;
+  --ring: #cc2f63;
+  --glow: color-mix(in oklch, var(--primary) 30%, transparent);
+  /* decorative pastels (stickers, tape, blocks) — never used for text */
+  --c-pink: #ffd6e3;
+  --c-lilac: #e4d9ff;
+  --c-butter: #fff0b3;
+  --c-mint: #d3f2e6;
+  --c-peach: #ffdccb;
+  color-scheme: light;
 }
 
 .theme-lab :is(h1, h2, h3) {
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
 }
 
 .theme-lab ::selection {
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: var(--c-pink);
+  color: var(--foreground);
 }
 
-/* Faint blueprint grid used as page/section backdrop. */
-.bg-blueprint {
-  background-image:
-    linear-gradient(to right, oklch(1 0 0 / 4%) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(1 0 0 / 4%) 1px, transparent 1px);
-  background-size: 48px 48px;
+/* Subtle film grain over the whole public site. */
+.theme-lab::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-.text-glow {
-  text-shadow: 0 0 28px var(--glow);
+/* Soft polka-dot backdrop for sections. */
+.bg-dots {
+  background-image: radial-gradient(color-mix(in oklch, var(--primary) 14%, transparent) 1.2px, transparent 1.3px);
+  background-size: 22px 22px;
 }
 
-/* Pointer-following light; --mx/--my are set on .theme-lab by CursorSpotlight. */
+/* Polaroid print: white frame with a deeper bottom margin for the caption. */
+.polaroid {
+  background: #fff;
+  padding: 0.6rem 0.6rem 2.6rem;
+  border-radius: 0.35rem;
+  box-shadow:
+    0 1px 2px rgb(59 42 47 / 0.08),
+    0 12px 28px -12px rgb(59 42 47 / 0.25);
+}
+
+/* Washi tape strip (absolute; position it with utilities). */
+.washi {
+  position: absolute;
+  height: 1.4rem;
+  width: 5.5rem;
+  opacity: 0.85;
+  background:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.35) 0 6px, transparent 6px 12px),
+    var(--tape, var(--c-pink));
+  box-shadow: 0 1px 2px rgb(59 42 47 / 0.12);
+  pointer-events: none;
+}
+
+/* Digicam date stamp. */
+.date-stamp {
+  font-family: var(--font-mono), monospace;
+  color: #ff8a3d;
+  text-shadow: 0 0 6px rgb(255 138 61 / 0.55);
+  letter-spacing: 0.08em;
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .animate-float-soft {
+    animation: float-soft 6s ease-in-out infinite;
+  }
+}
+
+/* Pointer-following light; --mx/--my are set by CursorSpotlight. */
 .spotlight {
   background: radial-gradient(
-    640px circle at var(--mx, 50%) var(--my, -30%),
-    color-mix(in oklch, var(--primary) 7%, transparent),
+    520px circle at var(--mx, 50%) var(--my, -30%),
+    color-mix(in oklch, var(--primary) 8%, transparent),
     transparent 60%
   );
 }

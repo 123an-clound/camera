@@ -1,4 +1,4 @@
-import { HeroStory, HomeBanners } from "@/components/public/hero";
+import { HeroCollage, HomeBanners } from "@/components/public/hero";
 import { ProductCard } from "@/components/public/product-card";
 import { FadeIn } from "@/components/motion/fade-in";
 import { RentalSteps } from "@/components/public/rental-steps";
@@ -28,14 +28,14 @@ function ProductSection({
     <FadeIn className="mx-auto max-w-6xl px-4 py-10">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-primary">
-            {String(index).padStart(2, "0")} / Bộ sưu tập
+          <p className="font-script text-xl text-primary">
+            {String(index).padStart(2, "0")} · bộ sưu tập ♡
           </p>
           <h2 className="mt-2 text-2xl font-bold tracking-tight md:text-3xl">{title}</h2>
         </div>
         <a
           href={href}
-          className="shrink-0 font-mono text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:text-primary"
+          className="shrink-0 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium transition-colors hover:border-primary hover:text-primary"
         >
           Xem tất cả →
         </a>
@@ -68,7 +68,7 @@ export default async function Home() {
   // Running "01 / 02 / …" numbers across the visible content sections.
   let n = 0;
   const render: Record<HomeSectionId, () => React.ReactNode> = {
-    story: () => <HeroStory key="story" />,
+    hero: () => <HeroCollage key="hero" />,
     banners: () => <HomeBanners key="banners" />,
     featured: () => (
       <ProductSection key="featured" index={++n} title={home.featured_title} href="/products" products={featured} emptyText="Chưa có sản phẩm nổi bật." />

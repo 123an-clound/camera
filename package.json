@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --no-warnings lib/rental.check.mjs && node --no-warnings lib/cart-logic.check.mjs && node --no-warnings lib/site-config.check.mjs && node --no-warnings components/public/camera-story/explode.check.mjs",
+    "test": "node --no-warnings lib/rental.check.mjs && node --no-warnings lib/cart-logic.check.mjs && node --no-warnings lib/site-config.check.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

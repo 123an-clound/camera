@@ -19,17 +19,19 @@ const httpsUrl = z
   .max(500)
   .refine((v) => v === "" || /^https:\/\//i.test(v), "Link phải bắt đầu bằng https://");
 
+// Accent presets for the light "Soft Film" public theme. Each primary keeps ≥4.5:1 contrast
+// with white text and with the cream background (#FFF7F0), so it is safe for buttons and links.
 export const ACCENTS = {
-  amber: { label: "Cam hổ phách", primary: "oklch(0.8 0.16 70)", foreground: "oklch(0.18 0.02 60)" },
-  cyan: { label: "Xanh cyan", primary: "oklch(0.8 0.13 210)", foreground: "oklch(0.18 0.03 220)" },
-  lime: { label: "Xanh chanh", primary: "oklch(0.86 0.18 130)", foreground: "oklch(0.2 0.04 130)" },
-  rose: { label: "Hồng đỏ", primary: "oklch(0.72 0.17 12)", foreground: "oklch(0.98 0.01 12)" },
-  violet: { label: "Tím", primary: "oklch(0.72 0.16 295)", foreground: "oklch(0.98 0.01 295)" },
+  strawberry: { label: "Hồng dâu", primary: "#cc2f63", foreground: "#ffffff" },
+  lilac: { label: "Tím lilac", primary: "#7a55d6", foreground: "#ffffff" },
+  peach: { label: "Cam đào", primary: "#b8482a", foreground: "#ffffff" },
+  mint: { label: "Xanh mint", primary: "#1a7f65", foreground: "#ffffff" },
+  honey: { label: "Vàng mật ong", primary: "#8f6300", foreground: "#ffffff" },
 } as const;
 export type AccentName = keyof typeof ACCENTS;
 
 export const HOME_SECTIONS = {
-  story: "Story 3D (hero)",
+  hero: "Hero (collage ảnh)",
   banners: "Banner",
   featured: "Sản phẩm nổi bật",
   sale: "Máy ảnh bán",
@@ -59,16 +61,8 @@ export const schemas = {
     steps_title: text(80),
     steps: z.array(titledText).min(1).max(6),
   }),
-  story: z.object({
-    hud: text(80),
-    chapters: z
-      .array(z.object({ kicker: text(40), title: text(80), body: text(300), spec: text(80) }))
-      .length(4, "Story luôn có đúng 4 chương (khớp 4 cảnh tách linh kiện)"),
-    outro: z.object({ kicker: text(40), title: text(80), body: text(300), cta_label: text(40), cta_href: link }),
-  }),
   theme: z.object({
     accent: z.enum(Object.keys(ACCENTS) as [AccentName, ...AccentName[]]),
-    enable_3d: z.boolean(),
     enable_spotlight: z.boolean(),
     enable_transition: z.boolean(),
     announcement_enabled: z.boolean(),
@@ -108,7 +102,6 @@ export type SiteConfigGroups = { [K in ConfigGroup]: z.infer<(typeof schemas)[K]
 
 export const CONFIG_KEYS: Record<ConfigGroup, string> = {
   home: "cfg_home",
-  story: "cfg_story",
   theme: "cfg_theme",
   nav: "cfg_nav",
   footer: "cfg_footer",
@@ -119,7 +112,7 @@ export const CONFIG_KEYS: Record<ConfigGroup, string> = {
 
 export const DEFAULTS: SiteConfigGroups = {
   home: {
-    hero_kicker: "● Optical Lab · Bán & cho thuê",
+    hero_kicker: "✦ Cho thuê & bán máy ảnh xinh",
     cta_primary_label: "Thuê máy ngay",
     cta_primary_href: "/products?mode=rent",
     cta_secondary_label: "Mua máy",
@@ -129,52 +122,15 @@ export const DEFAULTS: SiteConfigGroups = {
     sale_title: "Máy ảnh bán",
     rent_title: "Máy ảnh cho thuê",
     steps_kicker: "Quy trình thuê",
-    steps_title: "Ba bước, một khung hình",
+    steps_title: "Ba bước là có máy xinh",
     steps: [
       { title: "Chọn máy", body: "Lọc theo hãng, ngàm và ngân sách. Mỗi máy ghi rõ tình trạng và shutter count." },
       { title: "Đặt lịch", body: "Chọn ngày nhận và trả, gửi yêu cầu. Shop xác nhận qua điện thoại trong ngày." },
       { title: "Nhận máy & bấm", body: "Nhận máy đã vệ sinh, sạc đầy pin, đủ phụ kiện. Trả máy đúng hẹn là xong." },
     ],
   },
-  story: {
-    hud: "FUJIFILM X-T5 · ISO 125 · 1/250 · ƒ/2.8",
-    chapters: [
-      {
-        kicker: "Ống kính",
-        title: "Soi từng thấu kính",
-        body: "Mỗi ống kính được kiểm tra nấm mốc, bụi và hiệu chỉnh lấy nét trước và sau mỗi lượt thuê.",
-        spec: "XF18-55mm · 14 thấu kính · 7 lá khẩu",
-      },
-      {
-        kicker: "Màn trập",
-        title: "Shutter count minh bạch",
-        body: "Số lần chụp được ghi rõ trên từng máy, bạn biết chính xác thiết bị mình nhận.",
-        spec: "1/8000s cơ · 1/180000s điện tử",
-      },
-      {
-        kicker: "Cảm biến",
-        title: "Cảm biến sạch như mới",
-        body: "Vệ sinh cảm biến định kỳ, không một hạt bụi nào lọt vào khung hình của bạn.",
-        spec: "X-Trans CMOS 5 HR · 40.2MP · IBIS 7 stop",
-      },
-      {
-        kicker: "Phụ kiện",
-        title: "Đủ bộ, sẵn sàng bấm máy",
-        body: "Mỗi lượt thuê kèm 2 pin NP-W235 sạc đầy, sạc, thẻ nhớ 128GB và túi chống sốc.",
-        spec: "2× NP-W235 · 128GB · túi",
-      },
-    ],
-    outro: {
-      kicker: "Sẵn sàng",
-      title: "Khung hình tiếp theo là của bạn",
-      body: "Hàng chục thân máy và ống kính đã được kiểm tra, sẵn sàng giao trong ngày.",
-      cta_label: "Khám phá kho máy",
-      cta_href: "/products",
-    },
-  },
   theme: {
-    accent: "amber",
-    enable_3d: true,
+    accent: "strawberry",
     enable_spotlight: true,
     enable_transition: true,
     announcement_enabled: false,
@@ -192,7 +148,7 @@ export const DEFAULTS: SiteConfigGroups = {
   },
   footer: {
     tagline: "Mỗi khung hình đẹp bắt đầu từ một chiếc máy được chăm chút.",
-    exif: "ISO 100 · 1/250s · ƒ/1.8 · AWB",
+    exif: "Chụp thật xinh, sống thật vui ♡",
     links: [
       { label: "Giới thiệu", href: "/about" },
       { label: "Liên hệ", href: "/contact" },

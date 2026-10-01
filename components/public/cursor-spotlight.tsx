@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-// Soft amber light that follows the pointer across public pages.
+// Soft accent-tinted light that follows the pointer across public pages.
 // Mouse/pen only, and off for reduced motion — touch users get the static page.
 export function CursorSpotlight() {
   const ref = useRef<HTMLDivElement>(null);
@@ -27,5 +27,5 @@ export function CursorSpotlight() {
     };
   }, []);
 
-  return <div ref={ref} aria-hidden className="spotlight pointer-events-none fixed inset-0 z-30 mix-blend-screen" />;
+  return <div ref={ref} aria-hidden className="spotlight pointer-events-none fixed inset-0 z-30" />;
 }

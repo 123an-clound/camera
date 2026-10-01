@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Chakra_Petch, Geist, Geist_Mono } from "next/font/google";
+import { Baloo_2, Dancing_Script, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart";
 import { Toaster } from "@/components/ui/sonner";
@@ -19,10 +19,18 @@ const geistMono = Geist_Mono({
   preload: false,
 });
 
-const chakraPetch = Chakra_Petch({
-  variable: "--font-chakra",
+const baloo = Baloo_2({
+  variable: "--font-baloo",
   subsets: ["latin", "vietnamese"],
-  weight: ["600", "700"], // headings use semibold/bold only
+  weight: ["600", "700", "800"],
+});
+
+// Handwritten accents only (a few words) — not worth preloading.
+const dancing = Dancing_Script({
+  variable: "--font-dancing",
+  subsets: ["latin", "vietnamese"],
+  weight: ["600"],
+  preload: false,
 });
 
 // Site-wide SEO is admin-editable (Settings → SEO); empty fields fall back to these defaults.
@@ -55,7 +63,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="vi"
-      className={`${geistSans.variable} ${geistMono.variable} ${chakraPetch.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${baloo.variable} ${dancing.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <CartProvider>
